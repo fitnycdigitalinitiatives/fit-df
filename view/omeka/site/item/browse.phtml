@@ -1,0 +1,139 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('body')->appendAttribute('class', 'item resource browse');
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $this->lang();
+
+$query = $this->params()->fromQuery();
+$year = "";
+if (array_key_exists('property', $query) && array_key_exists('type', $query['property'][0]) && ($query['property'][0]['type'] == "sw") && array_key_exists('text', $query['property'][0])) {
+  $year = " (" . $query['property'][0]['text'] . ")";
+}
+$totalResults = $this->pagination()->getPaginator()->getTotalCount();
+$itemSetShow = isset($itemSet);
+if ($itemSetShow):
+  $this->htmlElement('body')->appendAttribute('class', 'item-set');
+  $query['item_set_id'] = $itemSet->id();
+endif;
+$sortHeadings = [
+  [
+    'label' => $translate('Date'),
+    'value' => 'dcterms:date'
+  ],
+];
+?>
+
+<div class="container pt-2 pb-3 pt-md-5 pb-md-4">
+  <div class="row">
+    <div class="col">
+      <?php if ($itemSetShow || (array_key_exists('item_set_id', $query) && ($item_set_id = $query['item_set_id']) && ($itemSet = $this->api()->read('item_sets', $item_set_id[0])->getContent()) && ($itemSetShow = 1))): ?>
+        <?php echo $this->pageTitle($itemSet->displayTitle(null, ($filterLocale ? $lang : null)) . $year, 2); ?>
+      <?php else: ?>
+        <?php echo $this->pageTitle($translate('Browse Designer Files'), 2); ?>
+      <?php endif; ?>
+    </div>
+  </div>
+  <div class="row align-items-center mb-5" id="facet-row">
+    <?php // check if solr/search module is activated by checking if the helper is present ?>
+    <?php if (($totalResults > 0) && ($this->getHelperPluginManager()->has('getFacetsForBrowse')) && (!array_key_exists('scroll_request', $query))): ?>
+      <?php $facetsForBrowse = $this->getFacetsForBrowse($query, $itemSetShow); ?>
+      <?php if ($facetsForBrowse && $facetsForBrowse['facets']): ?>
+        <?php
+        $hasFacets = false;
+        foreach ($facetsForBrowse['facets'] as $key => $value) {
+          if ($value) {
+            $hasFacets = true;
+          }
+        }
+        ?>
+        <?php if ($hasFacets): ?>
+          <?php echo $this->partial('search/facets', ['facets' => $facetsForBrowse['facets'], 'dateFacetStats' => $facetsForBrowse['dateFacetStats'], 'queryParams' => $this->params()->fromQuery(), 'firstItem' => null]); ?>
+        <?php endif; ?>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
+  <div class="row align-items-center">
+    <div class="col">
+      <?php if ($totalResults > 0): ?>
+        <?php if ($this->searchFilters() && !$itemSetShow): ?>
+          <div class="results mb-3">
+            Showing
+            <?php echo number_format($totalResults); ?>
+            <?php echo ($totalResults == 1) ? ' item' : ' items'; ?> for:
+            <?php echo $this->searchFilters(); ?>
+          </div>
+        <?php else: ?>
+          <div class="results mb-3">
+            Showing
+            <?php echo number_format($totalResults); ?>
+            <?php echo ($totalResults == 1) ? ' item' : ' items'; ?>
+          </div>
+        <?php endif; ?>
+      <?php else: ?>
+        <div class="results mb-3">
+          Showing 0 results for:
+          <?php echo $this->searchFilters(); ?>
+        </div>
+        <p class="lead">
+          <?php echo $this->translate('We\'re sorry, but your search did not return any items. Please try searching again, or browsing through the items or collections.'); ?>
+        </p>
+      <?php endif; ?>
+    </div>
+    <?php if ($totalResults > 0): ?>
+      <div class="col-12 col-sm-auto">
+        <?php echo $this->sortSelector($sortHeadings); ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+<?php if ($totalResults > 0): ?>
+
+
+  <?php $this->trigger('view.browse.before'); ?>
+  <div class="container list pt-2 pb-3 pt-md-3 pb-md-4">
+    <div class="row grid" id="browse-container">
+      <?php
+      $headingTerm = $this->siteSetting('browse_heading_property_term');
+      $bodyTerm = $this->siteSetting('browse_body_property_term');
+      foreach ($items as $item):
+        $heading = $headingTerm ? $item->value($headingTerm, ['default' => $translate('[Untitled]'), 'lang' => ($filterLocale ? [$lang, ''] : null)]) : $item->displayTitle(null, ($filterLocale ? [$lang, ''] : null));
+        switch ($heading) {
+          case str_contains($heading, "Fashion Calendar,"):
+            $displayTitle = trim(explode("Fashion Calendar,", $heading)[1]);
+            break;
+          case str_contains($heading, "Fashion International,"):
+            $displayTitle = trim(explode("Fashion International,", $heading)[1]);
+            break;
+          case str_contains($heading, "Home Furnishings Calendar,"):
+            $displayTitle = trim(explode("Home Furnishings Calendar,", $heading)[1]);
+            break;
+          default:
+            $displayTitle = $heading;
+        }
+        ?>
+        <div class="col item-container">
+          <div class="card border-0">
+            <?php echo $item->linkRaw($this->thumbnail($item, 'medium', ['class' => 'browse-thumbnail shadow-sm rounded', 'alt' => $heading]), null, ['class' => 'card-img']); ?>
+            <div class="card-body overflow-hidden">
+              <h3 class="item-title">
+                <?php echo $item->link($displayTitle, null, ['class' => 'text-light text-decoration-none']); ?>
+              </h3>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php $this->trigger('view.browse.after'); ?>
+  <?php if ($totalResults > $this->siteSetting('pagination_per_page')): ?>
+    <div class="container pb-5">
+      <div class="row justify-content-center pagination-row">
+        <div class="col-auto">
+          <?php echo $this->pagination(); ?>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+<?php endif; ?>

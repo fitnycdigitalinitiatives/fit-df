@@ -1,0 +1,27 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+if (!$sortByQuery) {
+    $sortByQuery = 'created';
+}
+if (!$sortOrderQuery) {
+    $sortOrderQuery = 'asc';
+}
+?>
+<form class="sorting" action="">
+    <div class="input-group">
+        <span class="input-group-text bg-dark text-white"><i class="fas fa-sort" aria-hidden="true"
+                title="Sort issues"></i><span class="sr-only">Sort issues</span></span>
+        <select class="form-select" name="sort_order" aria-label="<?php echo $translate('Sort order'); ?>"
+            onchange="this.form.submit()">
+            <option value="asc" <?php echo ($sortOrderQuery === 'asc') ? 'selected' : ''; ?>>
+                Oldest to Newest
+            </option>
+            <option value="desc" <?php echo ($sortOrderQuery === 'desc') ? 'selected' : ''; ?>>
+                Newest to Oldest
+            </option>
+        </select>
+    </div>
+    <input type="hidden" name="sort_by" value="dcterms:date">
+    <?php echo $this->queryToHiddenInputs(['sort_by', 'sort_order']); ?>
+</form>

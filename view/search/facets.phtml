@@ -1,0 +1,184 @@
+<?php
+/*
+ * Copyright BibLibre, 2016
+ *
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software.  You can use, modify and/ or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated with
+ * loading, using, modifying and/or developing or reproducing the software by
+ * the user in light of its specific status of free software, that may mean that
+ * it is complicated to manipulate, and that also therefore means that it is
+ * reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling
+ * the security of their systems and/or data to be ensured and, more generally,
+ * to use and operate it in the same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+$this->headScript()->appendFile($this->assetUrl('js/dateRange.js'));
+// echo json_encode($facets);
+$queryFacets = [];
+if (array_key_exists('limit', $queryParams)) {
+  $queryFacets = $queryParams['limit'];
+}
+?>
+
+<?php if (!empty($facets)): ?>
+
+  <?php foreach ($facets as $name => $facetValues): ?>
+    <?php
+    $currentValues = [];
+    if (array_key_exists($name, $queryFacets)) {
+      $currentValues = $queryFacets[$name];
+    }
+    $placeholder = "Select a " . $this->facetLabel($name) . "...";
+    $disabled = false;
+    if ((count($currentValues) == 0) && (count($facetValues) == 0)) {
+      $placeholder = "Not available for these results.";
+      $disabled = true;
+    }
+    if ($name == "item_set_dcterms_title") {
+      $hasFileSlideOptions = false;
+      $fileSlideDisabled = false;
+      $fileSelected = false;
+      $slideSelected = false;
+      foreach ($facetValues as $facetValueKey => $facetValue) {
+        if ($facetValue["value"] == "Designer Slides" || $facetValue["value"] == "Designer Files") {
+          $hasFileSlideOptions = true;
+          unset($facetValues[$facetValueKey]);
+        }
+      }
+      foreach ($currentValues as $currentValueKey => $currentValue) {
+        if ($currentValue == "Designer Slides") {
+          $slideSelected = true;
+          unset($currentValues[$currentValueKey]);
+        } elseif ($currentValue == "Designer Files") {
+          $fileSelected = true;
+          unset($currentValues[$currentValueKey]);
+        }
+      }
+      if (!$hasFileSlideOptions && !$slideSelected && !$fileSelected) {
+        $fileSlideDisabled = true;
+        if ($firstItem) {
+          foreach ($firstItem->itemSets() as $itemSet) {
+            if ($itemSet->displayTitle() == "Designer Slides") {
+              $slideSelected = true;
+              break;
+            } elseif ($itemSet->displayTitle() == "Designer Files") {
+              $fileSelected = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    ?>
+    <div class="col-lg-3 order-first">
+      <label for="<?php echo $this->facetLabel($name); ?>" class="form-label">
+        <?php echo $this->facetLabel($name); ?>
+      </label>
+    </div>
+    <div class="col-lg-3">
+      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" style="visibility:hidden"
+        data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?>>
+        <?php foreach ($currentValues as $currentValue): ?>
+          <option selected value="<?php echo $this->facetLink($name, ['value' => $currentValue, 'count' => null]); ?>">
+            <?php echo $currentValue; ?>
+          </option>
+        <?php endforeach; ?>
+        <?php $empty = true; ?>
+        <?php foreach ($facetValues as $facetValue): ?>
+          <?php $empty = false; ?>
+          <option value="<?php echo $this->facetLink($name, $facetValue); ?>"
+            data-count="<?php echo $facetValue["count"]; ?>">
+            <?php echo $facetValue["value"]; ?>
+          </option>
+        <?php endforeach; ?>
+        <?php if ($empty): ?>
+          <option disabled value="">No additional <?php echo strtolower($this->facetLabel($name)); ?>s available for these
+            results.
+          </option>
+        <?php endif; ?>
+      </select>
+    </div>
+  <?php endforeach; ?>
+  <div class="col-lg-3 order-first">
+    <label for="date-facet-slider" class="form-label">Date</label>
+  </div>
+  <?php
+  $currentMin = 0;
+  $currentMax = 0;
+  $totalMin = 0;
+  $totalMax = 0;
+  $disabled = false;
+  if ((!empty($dateFacetStats)) && (!empty($dateFacetStats["min"])) && (!empty($dateFacetStats["max"]))) {
+    if (isset($queryParams['date_range_start']) && ($queryParams['date_range_start'][0]) && ($queryParams['date_range_start'][0] > $dateFacetStats["min"])) {
+      $currentMin = $queryParams['date_range_start'][0];
+    } else {
+      $currentMin = $dateFacetStats["min"];
+    }
+    if (isset($queryParams['date_range_end']) && ($queryParams['date_range_end'][0]) && ($queryParams['date_range_end'][0] < $dateFacetStats["max"])) {
+      $currentMax = $queryParams['date_range_end'][0];
+    } else {
+      $currentMax = $dateFacetStats["max"];
+    }
+    if (!empty($dateFacetStats["totalMin"])) {
+      $totalMin = $dateFacetStats["totalMin"];
+    } else {
+      $totalMin = $currentMin;
+    }
+    if (!empty($dateFacetStats["totalMax"])) {
+      $totalMax = $dateFacetStats["totalMax"];
+    } else {
+      $totalMax = $currentMin;
+    }
+  }
+  if (($currentMin == $totalMin) && ($currentMax == $totalMax) && ($currentMin == $currentMax)) {
+    $disabled = true;
+  }
+  ?>
+  <div class="col-lg-3">
+    <div class="row align-items-center">
+      <div class="col">
+        <div id="date-facet-slider" data-currentmin="<?php echo $currentMin; ?>" data-totalmin="<?php echo $totalMin; ?>"
+          data-currentmax="<?php echo $currentMax; ?>" data-totalmax="<?php echo $totalMax; ?>"
+          data-disabled="<?php echo $disabled ? "disabled" : ""; ?>"></div>
+      </div>
+      <div class="col-auto">
+        <form id="dateRangeFacet" method="get" action="<?php echo $this->dateRangeFacetURL(); ?>">
+          <input type="hidden" id="dateRangeMin" name="date_range_start[]" min="<?php echo $totalMin; ?>"
+            max="<?php echo $totalMax; ?>">
+          <input type="hidden" id="dateRangeMax" name="date_range_end[]" min="<?php echo $totalMin; ?>"
+            max="<?php echo $totalMax; ?>">
+          <button type="submit" class="btn btn-secondary btn-sm" aria-label="Set date range" <?php echo $disabled ? "disabled" : ""; ?>>
+            Set
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-auto">
+    <legend class="form-label">Show Only</legend>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="fileoption"
+        value="files" <?php echo $fileSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?>>
+      <label class="form-check-label" for="fileoption">Clippings</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
+        value="slides" <?php echo $slideSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?>>
+      <label class="form-check-label" for="slideoption">Runway Slides</label>
+    </div>
+  </div>
+<?php endif; ?>
