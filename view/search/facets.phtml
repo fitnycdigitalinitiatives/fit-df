@@ -25,6 +25,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+use Laminas\Uri\UriFactory;
 $this->headScript()->appendFile($this->assetUrl('js/dateRange.js'));
 // echo json_encode($facets);
 $queryFacets = [];
@@ -52,19 +53,39 @@ if (array_key_exists('limit', $queryParams)) {
       $fileSlideDisabled = false;
       $fileSelected = false;
       $slideSelected = false;
+      $slideLink = "";
+      $fileLink = "";
       foreach ($facetValues as $facetValueKey => $facetValue) {
         if ($facetValue["value"] == "Designer Slides" || $facetValue["value"] == "Designer Files") {
           $hasFileSlideOptions = true;
           unset($facetValues[$facetValueKey]);
+          $slideLink = $this->facetLink($name, ['value' => "Designer Slides", 'count' => null]);
+          $fileLink = $this->facetLink($name, ['value' => "Designer Files", 'count' => null]);
         }
       }
       foreach ($currentValues as $currentValueKey => $currentValue) {
         if ($currentValue == "Designer Slides") {
           $slideSelected = true;
           unset($currentValues[$currentValueKey]);
+          $slideLink = $this->facetLink($name, ['value' => "Designer Slides", 'count' => null]);
+          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Files", 'count' => null])));
+          $thisArray = $uri->getQueryAsArray();
+          unset($thisArray['limit'][$name][array_search('Designer Slides', $thisArray['limit'][$name])]);
+          $fileLink = $uri->setQuery($thisArray);
+          if ($this->getCountForQuery($thisArray) == 0) {
+            $fileSlideDisabled = true;
+          }
         } elseif ($currentValue == "Designer Files") {
           $fileSelected = true;
           unset($currentValues[$currentValueKey]);
+          $fileLink = $this->facetLink($name, ['value' => "Designer Files", 'count' => null]);
+          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Slides", 'count' => null])));
+          $thisArray = $uri->getQueryAsArray();
+          unset($thisArray['limit'][$name][array_search('Designer Files', $thisArray['limit'][$name])]);
+          $slideLink = $uri->setQuery($thisArray);
+          if ($this->getCountForQuery($thisArray) == 0) {
+            $fileSlideDisabled = true;
+          }
         }
       }
       if (!$hasFileSlideOptions && !$slideSelected && !$fileSelected) {
@@ -172,12 +193,12 @@ if (array_key_exists('limit', $queryParams)) {
     <legend class="form-label">Show Only</legend>
     <div class="form-check form-check-inline">
       <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="fileoption"
-        value="files" <?php echo $fileSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?>>
+        value="<?php echo $fileLink; ?>" <?php echo $fileSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
       <label class="form-check-label" for="fileoption">Clippings</label>
     </div>
     <div class="form-check form-check-inline">
       <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
-        value="slides" <?php echo $slideSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?>>
+        value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
       <label class="form-check-label" for="slideoption">Runway Slides</label>
     </div>
   </div>

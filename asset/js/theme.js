@@ -119,8 +119,21 @@ $(document).ready(function () {
       };
       new TomSelect(el, settings);
     });
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        $(".file-slide-option").each(function (index) {
+          if ($(this).attr('checked')) {
+            this.checked = true;
+          } else {
+            this.checked = false;
+          }
+        });
+      }
+    });
+
     $(".file-slide-option").change(function () {
       $(".file-slide-option").not(this).prop('checked', false);
+      window.location.href = $(this).val();
     });
   }
   //Media viewer
@@ -129,23 +142,5 @@ $(document).ready(function () {
     $('.clip-button').each(function (index) {
       new ClipboardJS(this);
     });
-    $("#text-download").on("click.fashionCalendar", function (event) {
-      event.preventDefault();
-      saveAs($(this).attr("href"), $(this).data("id") + ".txt");
-    });
-    $("#pdf-download").on("click.fashionCalendar", function (event) {
-      const id = $(this).data("id")
-      fetch(`/data-atlas-api/download?id=${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.url);
-          window.location.href = data.url;
-        }).catch((error) => {
-          console.log(error);
-          console.log(`Error downloading PDF`);
-        });
-    });
-    let title = $("#quick-details .title").text();
-    $(".pdf-container iframe").attr("title", title);
   }
 });
