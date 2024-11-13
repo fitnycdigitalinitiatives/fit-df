@@ -1,10 +1,11 @@
 <?php
+
 namespace OmekaTheme\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Representation\ItemRepresentation;
 
-class SocialShare extends AbstractHelper
+class ShareDownload extends AbstractHelper
 {
   public function __invoke(ItemRepresentation $item)
   {
@@ -14,7 +15,29 @@ class SocialShare extends AbstractHelper
     $author = $item->value('dcterms:contributor') ? $item->value('dcterms:contributor') . ". " : "";
     $body = 'From the FIT Institutional Repository:%0D%0A' . str_replace('..', '.', $author) . $title . '%0D%0A' . $url;
     $subject = $item->displayTitle();
-    return '
+    $imageEndpoint = "";
+    $filename = "";
+    if ($media = $item->media()) {
+      $media = $media[0];
+      $mediaType = $media->mediaType();
+      $accessURL = $media->mediaData()['access'];
+      $iiifEndpoint = $this->getView()->setting('fit_module_aws_iiif_endpoint');
+      if ((strpos($mediaType, 'image') === 0) && ($accessURL != '') && ($iiifEndpoint != '')) {
+        $parsed_url = parse_url($accessURL);
+        $key = ltrim($parsed_url["path"], '/');
+        $imageEndpoint = $iiifEndpoint . str_replace("/", "%2F", substr($key, 0, -4)) . "/full/max/0/default.jpg";
+        $filename = "{$title}.jpg";
+        foreach ($media->value('dcterms:identifier', ['all' => true, 'type' => 'uri']) as $value) {
+          if ($value->value() == "Reference Code") {
+            $filename = "{$value->uri()}.jpg";
+            break;
+          }
+        }
+      }
+    }
+
+
+    $html = '
         <!-- Social Share  -->
         <ul id="social-share" class="list-inline mb-0 mt-2 fs-4">
           <li class="list-inline-item">
@@ -30,21 +53,19 @@ class SocialShare extends AbstractHelper
               <span class="sr-only">Share this item via email</span>
             </a>
           </li>
+          ';
+    if ($imageEndpoint) {
+      $html .= '
           <li class="list-inline-item">
-            <a class="link-light" target="_blank" href="https://www.facebook.com/share.php?u=' . $url . '">
-              <i class="fab fa-facebook" title="Share this item on Facebook">
+            <button class="border-0 bg-transparent p-0 text-light download" data-url="' . $imageEndpoint . '" data-filename="' . $filename . '">
+              <i class="fas fa-download" title="Download this image">
               </i>
-              <span class="sr-only">Share this item on Facebook</span>
-            </a>
+              <span class="sr-only">Download this image</span>
+            </button>
           </li>
-          <li class="list-inline-item">
-            <a class="link-light" target="_blank" href="https://twitter.com/intent/tweet?url=' . $url . '">
-              <i class="fab fa-twitter" title="Share this item on Twitter">
-              </i>
-              <span class="sr-only">Share this item on Twitter</span>
-            </a>
-          </li>
-        </ul>
         ';
+    }
+    $html .= '</ul>';
+    return $html;
   }
 }

@@ -40,7 +40,7 @@ $totalResults = $response->getTotalResults();
 <div class="container pt-2 pb-3 pt-md-5 pb-md-4">
   <div class="row">
     <div class="col">
-      <?php echo $this->pageTitle($this->translate('Browse Designer Files'), 2); ?>
+      <?php echo $this->pageTitle($this->translate('Files'), 2); ?>
       <?php echo $this->messages(); ?>
     </div>
   </div>
@@ -50,7 +50,7 @@ $totalResults = $response->getTotalResults();
       <div class="row align-items-center mb-5" id="facet-row">
         <?php echo $this->partial('search/facets', ['facets' => $facets, 'dateFacetStats' => $dateFacetStats, 'queryParams' => $this->params()->fromQuery(), 'firstItem' => $this->api()->read('items', $response->getResults('items')[0]['id'])->getContent()]); ?>
       </div>
-      <div class="row">
+      <div class="row align-items-center">
         <div class="col">
           <div class="results">
             Showing
@@ -58,6 +58,23 @@ $totalResults = $response->getTotalResults();
             <?php echo ($totalResults > 1) ? ' results' : ' result'; ?>
             <?php echo $this->QueryToStringHelper($this->params()->fromQuery(), $this->params()->fromRoute(), $this->searchForm()); ?>
           </div>
+        </div>
+        <div class="col-12 col-sm-auto">
+          <form class="input-group" id="search-results-sort">
+            <?php if ($sortOptions):
+              $sortSelect = new Laminas\Form\Element\Select('sort');
+              $sortSelect->setValueOptions($sortOptions);
+              $sortSelect->setValue($query->getSort());
+              $sortSelect->setAttributes(['class' => 'form-select', 'aria-label' => 'Sort by']);
+            endif; ?>
+            <?php if (!empty($sortSelect)): ?>
+              <span class="input-group-text">
+                <i class="fas fa-sort" aria-hidden="true" title="<?php echo 'Sort'; ?>">
+                </i>
+              </span>
+              <?php echo $this->formSelect($sortSelect); ?>
+            <?php endif; ?>
+          </form>
         </div>
       </div>
 
@@ -79,13 +96,6 @@ $totalResults = $response->getTotalResults();
 </div>
 
 <?php if (isset($response) && ($response->getTotalResults() > 0)): ?>
-  <?php
-  echo $this->partial('search/results-header', [
-    'query' => $query,
-    'response' => $response,
-    'sortOptions' => $sortOptions,
-  ]);
-  ?>
   <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
   <?php echo $this->partial('search/resource-list', [
     'response' => $response,
@@ -107,16 +117,16 @@ $totalResults = $response->getTotalResults();
     'response' => $response,
     'sortOptions' => $sortOptions,
   ]);
-?>
+  ?>
 <?php endif; ?>
 
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
 
-    $('#search-results-sort select').on('change', function () {
+    $('#search-results-sort select').on('change', function() {
       Search.sortBy($(this).val());
     });
-    $('.expander').on("click", function () {
+    $('.expander').on("click", function() {
       if ($(this).attr('aria-expanded') == "true") {
         $(this).text("Less");
       } else {

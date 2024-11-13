@@ -25,7 +25,7 @@ $lang = $this->lang();
                   id="media-<?php echo $panel_id; ?>" role="tabpanel" aria-labelledby="media-<?php echo $panel_id; ?>-tab">
                   <?php echo $media->render(); ?>
                 </div>
-                <?php
+              <?php
                 $panel_id++;
               endforeach;
               ?>
@@ -45,7 +45,7 @@ $lang = $this->lang();
                   <?php echo $this->thumbnail($media, 'medium', ['class' => 'rounded img-fluid', 'alt' => $media->displayTitle(), 'title' => $media->displayTitle(), 'data-bs-toggle' => 'tooltip']); ?>
                 </button>
               </li>
-              <?php
+            <?php
               $tab_id++;
             endforeach;
             ?>
@@ -68,12 +68,11 @@ $lang = $this->lang();
     </div>
   </div>
 <?php endif; ?>
-
 <div class="container pt-2 pb-3 py-md-4" id="quick-details">
   <div class="row">
     <div class="col">
       <?php echo $this->pageTitle($item->displayTitle(null, ($filterLocale ? $lang : null)), 2); ?>
-      <?php echo $this->SocialShare($item); ?>
+      <?php echo $this->ShareDownload($item); ?>
     </div>
   </div>
 </div>
@@ -86,6 +85,19 @@ $lang = $this->lang();
       <?php echo $item->displayValues(); ?>
     </div>
     <div class="col-lg-5 col-xxl-4">
+      <div class="property">
+        <?php $itemSets = $item->itemSets(); ?>
+        <?php if (count($itemSets) > 0): ?>
+          <h4>
+            <?php echo $translate('Collections'); ?>
+          </h4>
+          <?php foreach ($itemSets as $itemSet): ?>
+            <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>">
+                <?php echo $itemSet->displayTitle(null, ($filterLocale ? $lang : null)); ?>
+              </a></div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
       <div class="property">
         <h4>
           <?php echo $translate('Citation'); ?>

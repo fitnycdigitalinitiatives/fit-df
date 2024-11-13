@@ -41,23 +41,15 @@ $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $translat
 
 ?>
 <div class="col item-container">
-  <div class="card border-0">
-    <?php echo $resource->linkRaw($this->thumbnail($resource, 'medium', ['class' => 'browse-thumbnail shadow-sm rounded', 'alt' => $heading]), null, ['class' => 'card-img']); ?>
-    <div class="card-body overflow-hidden">
+  <div class="card border-0 bg-transparent">
+    <?php echo $resource->linkRaw($this->thumbnail($resource, 'medium', ['class' => 'browse-thumbnail', 'alt' => $heading]), null, ['class' => 'card-img d-flex align-items-center justify-content-center']); ?>
+    <div class="card-body overflow-hidden px-0">
       <h3 class="item-title">
         <?php echo $resource->link($heading, null, ['class' => 'text-light text-decoration-none']); ?>
       </h3>
-      <?php echo $this->CreatorHelper($resource); ?>
-      <?php echo $this->ItemDetailsHelper($resource); ?>
-      <?php if ($abstract = $resource->value('dcterms:abstract', ['lang' => ($filterLocale ? [$lang, ''] : null)])): ?>
-        <div class="abstract">
-          <?php echo $abstract->asHtml(); ?>
-        </div>
-      <?php elseif ($description = $resource->value('dcterms:description', ['lang' => ($filterLocale ? [$lang, ''] : null)])): ?>
-        <div class="description">
-          <?php echo $description->asHtml(); ?>
-        </div>
-      <?php endif; ?>
+      <div class="date">
+        <?php echo $this->DateHelper($resource); ?>
+      </div>
     </div>
   </div>
 </div>

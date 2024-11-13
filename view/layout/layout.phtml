@@ -46,7 +46,11 @@ $userBar = $this->userBar();
 <a class="visually-hidden-focusable" href="#content">
   <?php echo $this->translate('Skip to main content'); ?>
 </a>
-<?php echo $userBar; ?>
+<?php
+echo $userBar;
+echo $this->ssoLoginLinks();
+?>
+
 <header class="flex-shrink-0">
   <div class="container pt-5 d-none d-md-block">
     <div class="row justify-content-center">

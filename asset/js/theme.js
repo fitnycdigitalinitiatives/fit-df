@@ -91,7 +91,7 @@ $(document).ready(function () {
     }
     document.querySelectorAll('.facet-select').forEach((el) => {
       let settings = {
-        plugins: ['remove_button'],
+        plugins: ['remove_button', 'dropdown_input'],
         hidePlaceholder: true,
         closeAfterSelect: true,
         allowEmptyOption: true,
@@ -107,13 +107,16 @@ $(document).ready(function () {
           window.location.href = value;
         },
         onInitialize: function () {
-          el.style.visibility = "visible";
-
+          // el.style.visibility = "visible";
         },
         render: {
           option: function (data, escape) {
 
             return `<div>${escape(data.text)}${data.count ? ' (' + escape(data.count) + ')' : ''}</div>`;
+          },
+          item: function (data, escape) {
+
+            return `<div><span class="item-text">${escape(data.text)}</span></div>`;
           }
         }
       };

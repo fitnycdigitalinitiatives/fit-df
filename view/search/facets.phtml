@@ -25,9 +25,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+
 use Laminas\Uri\UriFactory;
+
 $this->headScript()->appendFile($this->assetUrl('js/dateRange.js'));
-// echo json_encode($facets);
 $queryFacets = [];
 if (array_key_exists('limit', $queryParams)) {
   $queryFacets = $queryParams['limit'];
@@ -40,7 +41,9 @@ if (array_key_exists('limit', $queryParams)) {
     <?php
     $currentValues = [];
     if (array_key_exists($name, $queryFacets)) {
-      $currentValues = $queryFacets[$name];
+      foreach ($queryFacets[$name] as $queryFacet) {
+        $currentValues[] = ['value' => $queryFacet, 'facetLink' => $this->facetLink($name, ['value' => $queryFacet, 'count' => null])];
+      }
     }
     $placeholder = "Select a " . $this->facetLabel($name) . "...";
     $disabled = false;
@@ -64,7 +67,7 @@ if (array_key_exists('limit', $queryParams)) {
         }
       }
       foreach ($currentValues as $currentValueKey => $currentValue) {
-        if ($currentValue == "Designer Slides") {
+        if ($currentValue['value'] == "Designer Slides") {
           $slideSelected = true;
           unset($currentValues[$currentValueKey]);
           $slideLink = $this->facetLink($name, ['value' => "Designer Slides", 'count' => null]);
@@ -75,7 +78,7 @@ if (array_key_exists('limit', $queryParams)) {
           if ($this->getCountForQuery($thisArray) == 0) {
             $fileSlideDisabled = true;
           }
-        } elseif ($currentValue == "Designer Files") {
+        } elseif ($currentValue['value'] == "Designer Files") {
           $fileSelected = true;
           unset($currentValues[$currentValueKey]);
           $fileLink = $this->facetLink($name, ['value' => "Designer Files", 'count' => null]);
@@ -102,19 +105,35 @@ if (array_key_exists('limit', $queryParams)) {
           }
         }
       }
+      if (isset($queryParams['item_set_id'])) {
+        if (!is_array($queryParams['item_set_id'])) {
+          $queryParams['item_set_id'] = [$queryParams['item_set_id']];
+        }
+        foreach ($queryParams['item_set_id'] as $thisItemSetId) {
+          if ($queryItemSet = $this->api()->read('item_sets', $thisItemSetId)->getContent()) {
+            $thisTitle = $queryItemSet->displayTitle();
+            $thisFacetURI = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => $thisTitle, 'count' => null])));
+            $thisFacetArray = $thisFacetURI->getQueryAsArray();
+            unset($thisFacetArray['limit'][$name][array_search($thisTitle, $thisFacetArray['limit'][$name])]);
+            unset($thisFacetArray['item_set_id'][array_search($thisItemSetId, $thisFacetArray['limit'])]);
+            $currentValues[] = ['value' => $thisTitle, 'facetLink' => $thisFacetURI->setQuery($thisFacetArray)];
+            $disabled = false;
+          }
+        }
+      }
     }
     ?>
-    <div class="col-lg-3 order-first">
+    <div class="col-lg-3 label-col">
       <label for="<?php echo $this->facetLabel($name); ?>" class="form-label">
         <?php echo $this->facetLabel($name); ?>
       </label>
     </div>
-    <div class="col-lg-3">
+    <div class="col-lg-3 mb-3">
       <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" style="visibility:hidden"
         data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?>>
         <?php foreach ($currentValues as $currentValue): ?>
-          <option selected value="<?php echo $this->facetLink($name, ['value' => $currentValue, 'count' => null]); ?>">
-            <?php echo $currentValue; ?>
+          <option selected value="<?php echo $currentValue['facetLink']; ?>">
+            <?php echo $currentValue['value']; ?>
           </option>
         <?php endforeach; ?>
         <?php $empty = true; ?>
@@ -133,8 +152,8 @@ if (array_key_exists('limit', $queryParams)) {
       </select>
     </div>
   <?php endforeach; ?>
-  <div class="col-lg-3 order-first">
-    <label for="date-facet-slider" class="form-label">Date</label>
+  <div class="col-lg-3 label-col">
+    <label class="form-label">Date</label>
   </div>
   <?php
   $currentMin = 0;
@@ -167,39 +186,56 @@ if (array_key_exists('limit', $queryParams)) {
   if (($currentMin == $totalMin) && ($currentMax == $totalMax) && ($currentMin == $currentMax)) {
     $disabled = true;
   }
+  $rangeURI = UriFactory::factory($this->dateRangeFacetURL());
+  $rangeURIqueriesArray = $rangeURI->getQueryAsArray();
   ?>
-  <div class="col-lg-3">
-    <div class="row align-items-center">
-      <div class="col">
-        <div id="date-facet-slider" data-currentmin="<?php echo $currentMin; ?>" data-totalmin="<?php echo $totalMin; ?>"
-          data-currentmax="<?php echo $currentMax; ?>" data-totalmax="<?php echo $totalMax; ?>"
-          data-disabled="<?php echo $disabled ? "disabled" : ""; ?>"></div>
-      </div>
-      <div class="col-auto">
-        <form id="dateRangeFacet" method="get" action="<?php echo $this->dateRangeFacetURL(); ?>">
-          <input type="hidden" id="dateRangeMin" name="date_range_start[]" min="<?php echo $totalMin; ?>"
-            max="<?php echo $totalMax; ?>">
-          <input type="hidden" id="dateRangeMax" name="date_range_end[]" min="<?php echo $totalMin; ?>"
-            max="<?php echo $totalMax; ?>">
-          <button type="submit" class="btn btn-secondary btn-sm" aria-label="Set date range" <?php echo $disabled ? "disabled" : ""; ?>>
-            Set
-          </button>
-        </form>
+  <div class="col-lg-3 mb-3">
+    <div class="row g-2 g-xl-3">
+      <div class="col"><select class="form-select date-select" id="dateRangeMin" name="date_range_start[]" aria-label="Date Range Start" <?php echo $disabled ? "disabled" : ""; ?>>
+          <?php for ($i = $totalMin; $i <= $currentMax && $i != 0; ++$i): ?>
+            <?php
+            $rangeURIqueriesArray["date_range_start[]"] = $i;
+            $rangeURIqueriesArray["date_range_end[]"] = $currentMax;
+            $rangeURI->setQuery($rangeURIqueriesArray);
+            ?>
+            <option <?php echo $i == $currentMin ? "selected" : ""; ?> value="<?php echo $rangeURI; ?>">
+              <?php echo $i; ?>
+            </option>
+          <?php endfor; ?>
+        </select></div>
+      <div class="col-auto"><span class="form-control-plaintext">to</span></div>
+      <div class="col"><select class="form-select date-select" id="dateRangeMax" name="date_range_end[]" aria-label="Date Range End" <?php echo $disabled ? "disabled" : ""; ?>>
+          <?php for ($i = $currentMin; $i <= $totalMax && $i != 0; ++$i): ?>
+            <?php
+            $rangeURIqueriesArray["date_range_start[]"] = $currentMin;
+            $rangeURIqueriesArray["date_range_end[]"] = $i;
+            $rangeURI->setQuery($rangeURIqueriesArray);
+            ?>
+            <option <?php echo $i == $currentMax ? "selected" : ""; ?> value="<?php echo $rangeURI; ?>">
+              <?php echo $i; ?>
+            </option>
+          <?php endfor; ?>
+        </select></div>
 
-      </div>
     </div>
   </div>
-  <div class="col-auto">
-    <legend class="form-label">Show Only</legend>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="fileoption"
-        value="<?php echo $fileLink; ?>" <?php echo $fileSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
-      <label class="form-check-label" for="fileoption">Clippings</label>
+  <div class="col">
+    <div class="row">
+      <div class="col-auto"><label class="form-label">Show Only</label></div>
     </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
-        value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?>   <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
-      <label class="form-check-label" for="slideoption">Runway Slides</label>
+    <div class="row">
+      <div class="col-auto">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="fileoption"
+            value="<?php echo $fileLink; ?>" <?php echo $fileSelected ? "checked" : ""; ?> <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+          <label class="form-check-label" for="fileoption">Clippings</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
+            value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?> <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+          <label class="form-check-label" for="slideoption">Runway Slides</label>
+        </div>
+      </div>
     </div>
   </div>
 <?php endif; ?>

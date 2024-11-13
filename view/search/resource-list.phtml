@@ -30,15 +30,15 @@
 <?php $results = $response->getResults($resourceName); ?>
 <?php if (!empty($results)): ?>
   <?php $resources = array(); ?>
-  <div class="container list pt-2 pb-3 pt-md-3 pb-md-4">
-    <div class="row list" id="browse-container">
+  <div class="container pt-2 pb-3 pt-md-3 pb-md-4">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 align-items-center" id="browse-container">
       <?php foreach ($results as $result): ?>
-          <?php $resource = $this->api()->read($resourceName, $result['id'])->getContent(); ?>
-          <?php echo $this->partial('search/resource', [
-              'resource' => $resource,
-              'site' => $site,
-          ]); ?>
-          <?php array_push($resources, $resource); ?>
+        <?php $resource = $this->api()->read($resourceName, $result['id'])->getContent(); ?>
+        <?php echo $this->partial('search/resource', [
+          'resource' => $resource,
+          'site' => $site,
+        ]); ?>
+        <?php array_push($resources, $resource); ?>
 
       <?php endforeach; ?>
     </div>
