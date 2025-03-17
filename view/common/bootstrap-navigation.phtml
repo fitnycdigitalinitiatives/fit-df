@@ -27,7 +27,7 @@ $escape = $this->plugin('escapeHtml');
         }
       }
       if ($access):
-        ?>
+      ?>
         <li class="nav-item dropdown">
           <?php $idName = str_replace(' ', '', $this->escapeHtml($this->translate($page->getLabel(), $this->navigation($container)->getTranslatorTextDomain()))); ?>
           <a class="nav-link link-light dropdown-toggle" id="<?php echo $idName; ?>" href="#" role="button"

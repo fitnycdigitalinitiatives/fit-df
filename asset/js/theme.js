@@ -19,7 +19,7 @@ $(document).ready(function () {
       var loadButton = `
       <div class="row justify-content-center">
         <div class="col-auto">
-          <button id="load-button" class="btn btn-fit-green floating-action" type="button" aria-controls="browse-container" aria-label="Load more results">
+          <button id="load-button" class="btn btn-light floating-action" type="button" aria-controls="browse-container" aria-label="Load more results">
             <span class="action-container">
               <i class="fas fa-plus" aria-hidden="true" title="Load more results">
               </i>
@@ -106,9 +106,6 @@ $(document).ready(function () {
         onItemRemove: function (value) {
           window.location.href = value;
         },
-        onInitialize: function () {
-          // el.style.visibility = "visible";
-        },
         render: {
           option: function (data, escape) {
 
@@ -124,7 +121,7 @@ $(document).ready(function () {
     });
     window.addEventListener('pageshow', (event) => {
       if (event.persisted) {
-        $(".file-slide-option").each(function (index) {
+        $(".clipping-slide-option").each(function (index) {
           if ($(this).attr('checked')) {
             this.checked = true;
           } else {
@@ -134,9 +131,12 @@ $(document).ready(function () {
       }
     });
 
-    $(".file-slide-option").change(function () {
-      $(".file-slide-option").not(this).prop('checked', false);
+    $(".clipping-slide-option").change(function () {
+      $(".clipping-slide-option").not(this).prop('checked', false);
       window.location.href = $(this).val();
+    });
+    $('#reset-filters').on("click", function () {
+      window.location.search = "";
     });
   }
   //Media viewer

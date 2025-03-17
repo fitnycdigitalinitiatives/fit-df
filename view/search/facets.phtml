@@ -29,6 +29,7 @@
 use Laminas\Uri\UriFactory;
 
 $this->headScript()->appendFile($this->assetUrl('js/dateRange.js'));
+$this->headScript()->appendFile($this->assetUrl('js/sortSelect.js'));
 $queryFacets = [];
 if (array_key_exists('limit', $queryParams)) {
   $queryFacets = $queryParams['limit'];
@@ -52,54 +53,55 @@ if (array_key_exists('limit', $queryParams)) {
       $disabled = true;
     }
     if ($name == "item_set_dcterms_title") {
-      $hasFileSlideOptions = false;
-      $fileSlideDisabled = false;
-      $fileSelected = false;
+      $hasClippingSlideOptions = false;
+      $clippingSlideDisabled = false;
+      $clippingSelected = false;
       $slideSelected = false;
       $slideLink = "";
-      $fileLink = "";
+      $clippingLink = "";
       foreach ($facetValues as $facetValueKey => $facetValue) {
-        if ($facetValue["value"] == "Designer Slides" || $facetValue["value"] == "Designer Files") {
-          $hasFileSlideOptions = true;
+        if ($facetValue["value"] == "Runway Slides" || $facetValue["value"] == "Designer Clippings") {
+          $hasClippingSlideOptions = true;
           unset($facetValues[$facetValueKey]);
-          $slideLink = $this->facetLink($name, ['value' => "Designer Slides", 'count' => null]);
-          $fileLink = $this->facetLink($name, ['value' => "Designer Files", 'count' => null]);
+          $slideLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
+          $clippingLink = $this->facetLink($name, ['value' => "Designer Clippings", 'count' => null]);
         }
       }
       foreach ($currentValues as $currentValueKey => $currentValue) {
-        if ($currentValue['value'] == "Designer Slides") {
+        if ($currentValue['value'] == "Runway Slides") {
           $slideSelected = true;
           unset($currentValues[$currentValueKey]);
-          $slideLink = $this->facetLink($name, ['value' => "Designer Slides", 'count' => null]);
-          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Files", 'count' => null])));
+          $slideLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
+          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Clippings", 'count' => null])));
           $thisArray = $uri->getQueryAsArray();
-          unset($thisArray['limit'][$name][array_search('Designer Slides', $thisArray['limit'][$name])]);
-          $fileLink = $uri->setQuery($thisArray);
+          unset($thisArray['limit'][$name][array_search('Runway Slides', $thisArray['limit'][$name])]);
+          $clippingLink = $uri->setQuery($thisArray);
           if ($this->getCountForQuery($thisArray) == 0) {
-            $fileSlideDisabled = true;
+            echo json_encode($thisArray);
+            $clippingSlideDisabled = true;
           }
-        } elseif ($currentValue['value'] == "Designer Files") {
-          $fileSelected = true;
+        } elseif ($currentValue['value'] == "Designer Clippings") {
+          $clippingSelected = true;
           unset($currentValues[$currentValueKey]);
-          $fileLink = $this->facetLink($name, ['value' => "Designer Files", 'count' => null]);
-          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Slides", 'count' => null])));
+          $clippingLink = $this->facetLink($name, ['value' => "Designer Clippings", 'count' => null]);
+          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Runway Slides", 'count' => null])));
           $thisArray = $uri->getQueryAsArray();
-          unset($thisArray['limit'][$name][array_search('Designer Files', $thisArray['limit'][$name])]);
+          unset($thisArray['limit'][$name][array_search('Designer Clippings', $thisArray['limit'][$name])]);
           $slideLink = $uri->setQuery($thisArray);
           if ($this->getCountForQuery($thisArray) == 0) {
-            $fileSlideDisabled = true;
+            $clippingSlideDisabled = true;
           }
         }
       }
-      if (!$hasFileSlideOptions && !$slideSelected && !$fileSelected) {
-        $fileSlideDisabled = true;
+      if (!$hasClippingSlideOptions && !$slideSelected && !$clippingSelected) {
+        $clippingSlideDisabled = true;
         if ($firstItem) {
           foreach ($firstItem->itemSets() as $itemSet) {
-            if ($itemSet->displayTitle() == "Designer Slides") {
+            if ($itemSet->displayTitle() == "Runway Slides") {
               $slideSelected = true;
               break;
-            } elseif ($itemSet->displayTitle() == "Designer Files") {
-              $fileSelected = true;
+            } elseif ($itemSet->displayTitle() == "Designer Clippings") {
+              $clippingSelected = true;
               break;
             }
           }
@@ -123,14 +125,11 @@ if (array_key_exists('limit', $queryParams)) {
       }
     }
     ?>
-    <div class="col-lg-3 label-col">
-      <label for="<?php echo $this->facetLabel($name); ?>" class="form-label">
+    <div class="col-md-4 mb-3">
+      <label for="<?php echo $this->facetLabel($name); ?>" class="form-label h5">
         <?php echo $this->facetLabel($name); ?>
       </label>
-    </div>
-    <div class="col-lg-3 mb-3">
-      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" style="visibility:hidden"
-        data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?>>
+      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?>>
         <?php foreach ($currentValues as $currentValue): ?>
           <option selected value="<?php echo $currentValue['facetLink']; ?>">
             <?php echo $currentValue['value']; ?>
@@ -152,44 +151,42 @@ if (array_key_exists('limit', $queryParams)) {
       </select>
     </div>
   <?php endforeach; ?>
-  <div class="col-lg-3 label-col">
-    <label class="form-label">Date</label>
-  </div>
-  <?php
-  $currentMin = 0;
-  $currentMax = 0;
-  $totalMin = 0;
-  $totalMax = 0;
-  $disabled = false;
-  if ((!empty($dateFacetStats)) && (!empty($dateFacetStats["min"])) && (!empty($dateFacetStats["max"]))) {
-    if (isset($queryParams['date_range_start']) && ($queryParams['date_range_start'][0]) && ($queryParams['date_range_start'][0] > $dateFacetStats["min"])) {
-      $currentMin = $queryParams['date_range_start'][0];
-    } else {
-      $currentMin = $dateFacetStats["min"];
+  <div class="col-md-4 mb-3">
+    <label class="form-label h5">Date</label>
+    <?php
+    $currentMin = 0;
+    $currentMax = 0;
+    $totalMin = 0;
+    $totalMax = 0;
+    $disabled = false;
+    if ((!empty($dateFacetStats)) && (!empty($dateFacetStats["min"])) && (!empty($dateFacetStats["max"]))) {
+      if (isset($queryParams['date_range_start']) && ($queryParams['date_range_start'][0]) && ($queryParams['date_range_start'][0] > $dateFacetStats["min"])) {
+        $currentMin = $queryParams['date_range_start'][0];
+      } else {
+        $currentMin = $dateFacetStats["min"];
+      }
+      if (isset($queryParams['date_range_end']) && ($queryParams['date_range_end'][0]) && ($queryParams['date_range_end'][0] < $dateFacetStats["max"])) {
+        $currentMax = $queryParams['date_range_end'][0];
+      } else {
+        $currentMax = $dateFacetStats["max"];
+      }
+      if (!empty($dateFacetStats["totalMin"])) {
+        $totalMin = $dateFacetStats["totalMin"];
+      } else {
+        $totalMin = $currentMin;
+      }
+      if (!empty($dateFacetStats["totalMax"])) {
+        $totalMax = $dateFacetStats["totalMax"];
+      } else {
+        $totalMax = $currentMin;
+      }
     }
-    if (isset($queryParams['date_range_end']) && ($queryParams['date_range_end'][0]) && ($queryParams['date_range_end'][0] < $dateFacetStats["max"])) {
-      $currentMax = $queryParams['date_range_end'][0];
-    } else {
-      $currentMax = $dateFacetStats["max"];
+    if (($currentMin == $totalMin) && ($currentMax == $totalMax) && ($currentMin == $currentMax)) {
+      $disabled = true;
     }
-    if (!empty($dateFacetStats["totalMin"])) {
-      $totalMin = $dateFacetStats["totalMin"];
-    } else {
-      $totalMin = $currentMin;
-    }
-    if (!empty($dateFacetStats["totalMax"])) {
-      $totalMax = $dateFacetStats["totalMax"];
-    } else {
-      $totalMax = $currentMin;
-    }
-  }
-  if (($currentMin == $totalMin) && ($currentMax == $totalMax) && ($currentMin == $currentMax)) {
-    $disabled = true;
-  }
-  $rangeURI = UriFactory::factory($this->dateRangeFacetURL());
-  $rangeURIqueriesArray = $rangeURI->getQueryAsArray();
-  ?>
-  <div class="col-lg-3 mb-3">
+    $rangeURI = UriFactory::factory($this->dateRangeFacetURL());
+    $rangeURIqueriesArray = $rangeURI->getQueryAsArray();
+    ?>
     <div class="row g-2 g-xl-3">
       <div class="col"><select class="form-select date-select" id="dateRangeMin" name="date_range_start[]" aria-label="Date Range Start" <?php echo $disabled ? "disabled" : ""; ?>>
           <?php for ($i = $totalMin; $i <= $currentMax && $i != 0; ++$i): ?>
@@ -219,23 +216,38 @@ if (array_key_exists('limit', $queryParams)) {
 
     </div>
   </div>
-  <div class="col">
-    <div class="row">
-      <div class="col-auto"><label class="form-label">Show Only</label></div>
-    </div>
-    <div class="row">
+  <div class="col-md-4 mb-3">
+    <label class="form-label h5">Sort</label>
+    <select id="sort" class="sort-select form-select" autocomplete="off">
+      <?php foreach ($sortOptions as $value => $sortOptionLabel): ?>
+        <option value="<?php echo $value; ?>" <?php echo $value == $currentSort ? "selected" : ""; ?>>
+          <?php echo $sortOptionLabel; ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+  </div>
+  <div class="col-12">
+    <div class="row justify-content-between">
       <div class="col-auto">
+        <label class="form-label h5 d-block">Show Only</label>
         <div class="form-check form-check-inline">
-          <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="fileoption"
-            value="<?php echo $fileLink; ?>" <?php echo $fileSelected ? "checked" : ""; ?> <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
-          <label class="form-check-label" for="fileoption">Clippings</label>
+          <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="clippingoption"
+            value="<?php echo $clippingLink; ?>" <?php echo $clippingSelected ? "checked" : ""; ?> <?php echo $clippingSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+          <label class="form-check-label" for="clippingoption">Designer Clippings</label>
         </div>
         <div class="form-check form-check-inline">
-          <input class="form-check-input file-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
-            value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?> <?php echo $fileSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+          <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
+            value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?> <?php echo $clippingSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
           <label class="form-check-label" for="slideoption">Runway Slides</label>
         </div>
       </div>
+      <?php if ($queryParams): ?>
+        <div class="col-auto">
+          <button id="reset-filters" class="p-0 bg-transparent border-0 link-light fs-6">
+            Reset filters
+          </button>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 <?php endif; ?>

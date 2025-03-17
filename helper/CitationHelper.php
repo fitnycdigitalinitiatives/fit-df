@@ -1,4 +1,5 @@
 <?php
+
 namespace OmekaTheme\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
@@ -10,20 +11,83 @@ class CitationHelper extends AbstractHelper
   {
     $escape = $this->getView()->plugin('escapeHtml');
     $title = $item->displayTitle();
+    $titleCased = $this->titleCase($title);
     $url = $escape($item->url());
-    $apa = 'Finley, R. <em>' . $title . '</em>. Fashion Calendar Research Database, ' . $url;
-    $chicago = 'Finley, Ruth. "' . $title . '". Fashion Calendar Research Database. ' . $url;
-    $mla = 'Finley, Ruth. <em>' . $title . '</em>. Fashion Calendar Research Database, ' . $url;
+    $date = $item->value('dcterms:date');
+    $type = "";
+    foreach ($item->itemSets() as $itemSet) {
+      $itemSetTitle = $itemSet->displayTitle();
+      if ($itemSetTitle == "Runway Slides") {
+        $type = "Runway Slides";
+        break;
+      } elseif ($itemSetTitle == "Designer Clippings") {
+        $type = "Designer Clippings";
+        break;
+      }
+    }
+    switch ($type) {
+      case 'Runway Slides':
+        $apaPhotographer = '';
+        $chicagoPhotographer = '';
+        $mlaPhotographer = '';
+        foreach ($item->value('dcterms:contributor', ['all' => true]) as $contributor) {
+          if (str_contains($contributor->asHtml(), 'Photographer')) {
+            $photographer = $contributor;
+            $lastName = trim(explode(",", $photographer)[0]);
+            $firstAndMiddle = trim(explode(",", $photographer)[1]);
+            $firstAndMiddleArray = explode(' ', $firstAndMiddle);
+            $initials = '';
+            foreach ($firstAndMiddleArray as $initialKey => $part) {
+              if ($initialKey == 0) {
+                $initials .= strtoupper($part[0]) . '.';
+              } else {
+                $initials .= ' ' . strtoupper($part[0]) . '.';
+              }
+            }
+            $apaPhotographer .= $lastName . ', ' . $initials . '. ';
+            $chicagoPhotographer .= $photographer . '. ';
+            $mlaPhotographer .= $photographer . '. ';
+            break;
+          }
+        }
+        if ($apaPhotographer) {
+          $apa = $apaPhotographer . '(' . $date . '). ' . $title . ' [Runway photo]. <em>The FIT Designer Files</em>. ' . $url;
+        } else {
+          $apa = $title . ' [Runway photo]. (' . $date . ')' . '. <em>The FIT Designer Files</em>. ' . $url;
+        }
+        $chicago = $chicagoPhotographer . '<em>' . $titleCased . '</em>. ' . $date . '. Runway photo. The FIT Designer Files. ' . $url;
+        $mla = $mlaPhotographer . $titleCased . ' Runway Photo. ' . $date . '. The FIT Designer Files, ' . $url;
+        break;
+
+      case 'Designer Clippings':
+        $source = $item->value('dcterms:source');
+        if ($source) {
+          $apa = $title . ' [Fashion clipping]. (' . $date . '). <em>' . $source . '</em>. The FIT Designer Files. ' . $url;
+          $chicago = '<em>' . $titleCased . '</em>. Fashion clipping. In <em>' . $source . '</em>. ' . $date . '. The FIT Designer Files. ' . $url;
+          $mla = $titleCased . ' Fashion Clipping. <em>' . $source . '</em>, ' . $date . '. The FIT Designer Files, ' . $url;
+        } else {
+          $apa = $title . ' [Fashion clipping]. (' . $date . ')' . '. <em>The FIT Designer Files</em>. ' . $url;
+          $chicago = '<em>' . $titleCased . '</em>. ' . $date . '. Fashion clipping. The FIT Designer Files. ' . $url;
+          $mla = $titleCased . ' Fashion Clipping. ' . $date . '. The FIT Designer Files, ' . $url;
+        }
+        break;
+
+      default:
+        $apa = $title . '. (' . $date . ')' . '. <em>The FIT Designer Files</em>. ' . $url;
+        $chicago = '<em>' . $titleCased . '</em>. ' . $date . '. The FIT Designer Files. ' . $url;
+        $mla = $titleCased . '. ' . $date . '. The FIT Designer Files, ' . $url;
+        break;
+    }
     return '
-        <ul class="nav nav-tabs mb-3" id="citationTab" role="tablist">
+        <ul class="nav nav-underline mb-3" id="citationTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active text-light" id="apa-tab" data-bs-toggle="tab" data-bs-target="#apa" type="button" role="tab" aria-controls="apa" aria-selected="true">APA</button>
+            <button class="nav-link pt-0 active text-light" id="apa-tab" data-bs-toggle="tab" data-bs-target="#apa" type="button" role="tab" aria-controls="apa" aria-selected="true">APA</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link text-light" id="mla-tab" data-bs-toggle="tab" data-bs-target="#mla" type="button" role="tab" aria-controls="mla" aria-selected="false">MLA</button>
+            <button class="nav-link pt-0 text-light" id="mla-tab" data-bs-toggle="tab" data-bs-target="#mla" type="button" role="tab" aria-controls="mla" aria-selected="false">MLA</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link text-light" id="chicago-tab" data-bs-toggle="tab" data-bs-target="#chicago" type="button" role="tab" aria-controls="chicago" aria-selected="false">Chicago/Turabian</button>
+            <button class="nav-link pt-0 text-light" id="chicago-tab" data-bs-toggle="tab" data-bs-target="#chicago" type="button" role="tab" aria-controls="chicago" aria-selected="false">Chicago/Turabian</button>
           </li>
         </ul>
         <div class="tab-content" id="citationTabContent">
@@ -32,7 +96,7 @@ class CitationHelper extends AbstractHelper
               <div class="form-control font-monospace text-break" id="apaCitation">
               ' . str_replace('..', '.', $apa) . '
               </div>
-              <button class="btn btn-dark clip-button" type="button" id="apa-button" data-clipboard-target="#apaCitation" aria-label="Copy citation to clipboard">
+              <button class="btn btn-dark border clip-button" type="button" id="apa-button" data-clipboard-target="#apaCitation" aria-label="Copy citation to clipboard">
                 <i class="fas fa-copy" title="Copy citation to clipboard" aria-hidden="true"></i>
               </button>
             </div>
@@ -42,7 +106,7 @@ class CitationHelper extends AbstractHelper
             <div class="form-control font-monospace text-break" id="mlaCitation">
             ' . str_replace('..', '.', $mla) . '
             </div>
-            <button class="btn btn-dark clip-button" type="button" id="mla-button" data-clipboard-target="#mlaCitation" aria-label="Copy citation to clipboard">
+            <button class="btn btn-dark border clip-button" type="button" id="mla-button" data-clipboard-target="#mlaCitation" aria-label="Copy citation to clipboard">
               <i class="fas fa-copy" title="Copy citation to clipboard" aria-hidden="true"></i>
             </button>
           </div>
@@ -52,7 +116,7 @@ class CitationHelper extends AbstractHelper
             <div class="form-control font-monospace text-break" id="chicagoCitation">
             ' . str_replace('..', '.', $chicago) . '
             </div>
-            <button class="btn btn-dark clip-button" type="button" id="chicago-button" data-clipboard-target="#chicagoCitation" aria-label="Copy citation to clipboard">
+            <button class="btn btn-dark border clip-button" type="button" id="chicago-button" data-clipboard-target="#chicagoCitation" aria-label="Copy citation to clipboard">
               <i class="fas fa-copy" title="Copy citation to clipboard" aria-hidden="true"></i>
             </button>
           </div>

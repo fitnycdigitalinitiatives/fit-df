@@ -8,12 +8,23 @@ $this->headScript()->appendFile('https://cdn.jsdelivr.net/npm/file-saver@2.0.5/d
 
 $filterLocale = (bool) $this->siteSetting('filter_locale_values');
 $lang = $this->lang();
+$itemSets = $item->itemSets();
+$designerSets = [];
+foreach ($itemSets as $key => $itemSet) {
+  foreach ($itemSet->value('dcterms:type', ['all' => true]) as $itemSetType) {
+    if (strtolower($itemSetType) == "designer") {
+      $designerSets[] = $itemSet;
+      unset($itemSets[$key]);
+      break;
+    }
+  }
+}
 ?>
 
 <?php $this->trigger('view.show.before'); ?>
 
 <?php if ($itemMedia): ?>
-  <div class="container pt-2 pb-3 pt-md-5 pb-md-4">
+  <div class="container pt-3 pb-3 pt-md-5 pb-md-4">
     <div class="row" id="media-wrapper">
       <?php if ((count($itemMedia) > 1)): ?>
         <div class="col-md-11">
@@ -68,7 +79,7 @@ $lang = $this->lang();
     </div>
   </div>
 <?php endif; ?>
-<div class="container pt-2 pb-3 py-md-4" id="quick-details">
+<div class="container pt-2 pb-3 pt-md-4 pb-md-5" id="quick-details">
   <div class="row">
     <div class="col">
       <?php echo $this->pageTitle($item->displayTitle(null, ($filterLocale ? $lang : null)), 2); ?>
@@ -76,34 +87,69 @@ $lang = $this->lang();
     </div>
   </div>
 </div>
-<div class="container pt-2 pb-3 pt-md-4 pt-md-5">
+<hr>
+<div class="container py-3 pt-md-5">
   <div class="row  justify-content-between">
-    <h3 class="mb-4">
-      <?php echo $translate('About this Item'); ?>
-    </h3>
-    <div class="col-lg-6 col-xxl-7">
+    <div class="col-xl-10 col-xxl-9">
+
+      <h3 class="mb-5 h5">
+        <?php echo $translate('File Info'); ?>
+      </h3>
+      <?php if (count($designerSets) > 0): ?>
+        <dl>
+          <div class="property">
+            <dt>
+              <?php echo $translate('Designer/Brand'); ?>
+            </dt>
+            <?php foreach ($designerSets as $designerSet): ?>
+              <dd class="value">
+                <?php echo $escape($designerSet->displayTitle()); ?>
+                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$designerSet->displayTitle()]]]]);; ?>" class="link-light ms-1">
+                  <i class="fas fa-search" title="Search for this designer/brand" aria-hidden="true"></i>
+                </a>
+                <?php foreach ($designerSet->value('dcterms:relation', ['all' => true, 'type' => 'uri']) as $relation): ?>
+                  <?php if (strtolower($relation->value()) == 'wikipedia') : ?>
+                    <a href="<?php echo $relation->uri(); ?>" target="_blank" class="link-light ms-1" aria-label="Read more about this designer/brand on Wikipedia">
+                      <i class="fas fa-info-circle" title="Read more about this designer/brand on Wikipedia" aria-hidden="true"></i>
+                    </a>
+                    <?php break; ?>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </dd>
+            <?php endforeach; ?>
+          </div>
+        </dl>
+      <?php endif; ?>
+      <?php if (count($itemSets) > 0): ?>
+        <dl>
+          <div class="property">
+            <dt>
+              <?php echo $translate('Collections'); ?>
+            </dt>
+            <?php foreach ($itemSets as $itemSet): ?>
+              <dd class="value">
+                <?php echo $escape($itemSet->displayTitle()); ?>
+                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$itemSet->displayTitle()]]]]);; ?>" class="ms-1">
+                  <i class="fas fa-search" title="Search for this collection" aria-hidden="true"></i>
+                </a>
+              </dd>
+            <?php endforeach; ?>
+          </div>
+        </dl>
+      <?php endif; ?>
       <?php echo $item->displayValues(); ?>
-    </div>
-    <div class="col-lg-5 col-xxl-4">
-      <div class="property">
-        <?php $itemSets = $item->itemSets(); ?>
-        <?php if (count($itemSets) > 0): ?>
-          <h4>
-            <?php echo $translate('Collections'); ?>
-          </h4>
-          <?php foreach ($itemSets as $itemSet): ?>
-            <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>">
-                <?php echo $itemSet->displayTitle(null, ($filterLocale ? $lang : null)); ?>
-              </a></div>
+      <dl>
+        <div class="property">
+          <dt>
+            <?php echo $translate('Citation'); ?>
+          </dt>
+          <?php foreach ($designerSets as $designerSet): ?>
+            <dd class="value">
+              <?php echo $this->CitationHelper($item); ?>
+            </dd>
           <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-      <div class="property">
-        <h4>
-          <?php echo $translate('Citation'); ?>
-        </h4>
-        <?php echo $this->CitationHelper($item); ?>
-      </div>
+        </div>
+      </dl>
     </div>
   </div>
 </div>

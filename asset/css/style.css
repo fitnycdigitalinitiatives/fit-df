@@ -101,9 +101,6 @@ a:hover {
   --bs-link-opacity: 0.75;
 }
 
-.card {
-  border-color: rgb(33, 37, 41);
-}
 
 .modal-content {
   border-color: rgb(33, 37, 41);
@@ -117,11 +114,6 @@ textarea.form-control::placeholder {
 .form-control:focus {
   border-color: initial;
   box-shadow: none;
-}
-
-.list-group-item-action:focus,
-.list-group-item-action:hover {
-  background-color: #fec2be;
 }
 
 .btn-close {
@@ -269,13 +261,70 @@ textarea.form-control::placeholder {
   border-color: #ff2eaa;
 }
 
+/* login */
+.login .modal-backdrop {
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 1 !important;
+}
+
+#loginModal p:last-of-type {
+  margin-bottom: 0;
+}
+
+#login-head {
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+#loginLabel {
+  font-size: 1.25rem;
+}
+
+#loginRights {
+  font-size: 0.875rem;
+}
+
+@media (min-width:768px) {
+  #login-head {
+    font-size: 1.5rem;
+  }
+
+  #loginLabel {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width:992px) {
+  #login-head {
+    font-size: 1.25rem;
+  }
+
+  #loginRights {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width:1200px) {
+  #login-head {
+    font-size: 1.45rem;
+  }
+}
+
 /* header */
 .logo h1 {
   font-size: 4.5rem;
 }
 
+.main-navbar {
+  border-bottom: 1px solid var(--bs-border-color);
+  padding-bottom: .5rem;
+}
+
 .navbar-brand img {
-  height: 25px;
+  max-height: 28px;
+  max-width: 100%;
 }
 
 header .logo img {
@@ -287,6 +336,12 @@ header .nav-link {
   font-weight: 300;
   letter-spacing: 3px;
   text-transform: uppercase;
+}
+
+header .user-info .nav-link {
+  font-weight: inherit;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .dropdown-submenu {
@@ -307,13 +362,38 @@ header .nav-link {
   margin-right: .1rem;
 }
 
-/* footer  */
-footer #clir-logo {
-  max-height: 75px;
+@media (min-width:768px) {
+  .main-navbar {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .main-navbar .navbar-nav {
+    --bs-nav-underline-gap: 1rem;
+    --bs-nav-underline-border-width: 0.125rem;
+    --bs-nav-underline-link-active-color: var(--bs-emphasis-color);
+    gap: var(--bs-nav-underline-gap);
+  }
+
+  .main-navbar .navbar-nav .nav-link.active,
+  .main-navbar .navbar-nav .show>.nav-link {
+    color: var(--bs-nav-underline-link-active-color);
+    border-bottom-color: currentcolor;
+  }
+
+  .main-navbar .navbar-nav .nav-link {
+    border-bottom: var(--bs-nav-underline-border-width) solid transparent;
+  }
+
+  .main-navbar .navbar-nav .nav-link:focus,
+  .main-navbar .navbar-nav .nav-link:hover {
+    border-bottom-color: currentcolor;
+  }
 }
 
-footer #fit-suny-logo {
-  max-height: 30px;
+/* footer  */
+footer #fit-logo {
+  height: 25px;
 }
 
 /* Search  */
@@ -393,9 +473,8 @@ footer #fit-suny-logo {
 
 .resource.browse .results,
 .resource.search .results {
-  font-family: "halyard-display", sans-serif;
   font-size: 1.25rem;
-  font-weight: bold;
+  font-style: italic;
 }
 
 #current-search {
@@ -405,6 +484,9 @@ footer #fit-suny-logo {
 
 
 #facet-row {
+  .ts-wrapper input::placeholder {
+    font-style: italic;
+  }
 
   .ts-control,
   .ts-control input,
@@ -537,6 +619,37 @@ footer #fit-suny-logo {
   }
 }
 
+/* Designer browse */
+.big-letter {
+  margin-top: -1.25rem;
+}
+
+#search-header h2 {
+  margin-bottom: 0;
+}
+
+#atoz {
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+
+  #atoz {
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+  }
+}
+
+
+#top-button {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: auto;
+}
+
+
 /* Item show */
 .fa-eye-slash,
 .o-icon-private {
@@ -668,7 +781,6 @@ footer #fit-suny-logo {
   font-weight: 300;
   letter-spacing: 3px;
   text-transform: uppercase;
-  font-size: 1.5rem;
 }
 
 
@@ -680,6 +792,7 @@ footer #fit-suny-logo {
 .item.resource.show .property a:hover {
   color: RGBA(249, 250, 251, .75)
 }
+
 
 .item.resource.show .property .resource-link {
   display: flex;
@@ -699,9 +812,6 @@ footer #fit-suny-logo {
 .item.resource.show .property .resource-link .resource-name {
   flex-grow: 1;
   margin-left: .75rem;
-  font-family: "halyard-display", sans-serif;
-  font-weight: bold;
-  color: #212529;
 }
 
 .item.resource.show .property .resource-link .resource-name:after {
@@ -710,7 +820,6 @@ footer #fit-suny-logo {
   font-weight: 900;
   display: inline-block;
   margin-left: 0.5em;
-  color: #6c757d;
 }
 
 .item.resource.show .collapsible.annotation .property {
@@ -800,6 +909,45 @@ footer #fit-suny-logo {
     top: 50%;
     transform: translateY(-50%);
     font-size: 2rem;
+  }
+
+  .item.resource.show .property {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1* var(--bs-gutter-y));
+    margin-right: calc(-.5* var(--bs-gutter-x));
+    margin-left: calc(-.5* var(--bs-gutter-x));
+    justify-content: flex-end;
+  }
+
+  .item.resource.show .property dt {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+    max-width: 100%;
+    padding-right: calc(var(--bs-gutter-x)* .5);
+    padding-left: calc(var(--bs-gutter-x)* .5);
+    margin-top: var(--bs-gutter-y);
+  }
+
+  .item.resource.show .property .value {
+    flex: 0 0 auto;
+    width: 66.66666667%;
+    max-width: 100%;
+    padding-right: calc(var(--bs-gutter-x)* .5);
+    padding-left: 1.5rem;
+    margin-top: var(--bs-gutter-y);
+  }
+}
+
+@media (min-width: 992px) {
+  .item.resource.show .property dt {
+    width: 25%;
+  }
+
+  .item.resource.show .property .value {
+    width: 75%;
   }
 }
 

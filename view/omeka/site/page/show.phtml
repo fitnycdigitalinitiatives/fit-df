@@ -9,7 +9,7 @@ $nav = $site->publicNav();
 $container = $nav->getContainer();
 $activePage = $nav->findActive($container);
 if ($activePage):
-  ?>
+?>
   <?php if ($activePage['depth'] !== 0): ?>
     <nav class="breadcrumbs">
       <?php echo $nav->breadcrumbs(); ?>
@@ -26,7 +26,7 @@ if ($activePage):
 <?php endif; ?>
 
 <?php $this->trigger('view.show.before'); ?>
-<div class="container py-3 py-md-4 py-lg-5">
+<div class="container pt-2 pb-3 pt-md-5 pb-md-4">
   <div class="row justify-content-center blocks">
     <?php echo $this->content; ?>
   </div>

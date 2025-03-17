@@ -1,0 +1,497 @@
+<?php
+$translate = $this->plugin('translate');
+$this->htmlElement('body')->appendAttribute('class', 'login');
+$this->headScript()->appendFile($this->assetUrl('js/login.js'));
+?>
+<noscript>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 p-4 p-lg-5">
+                <p id="loginLabel">
+                    This site is restricted to members of the FIT community (current students, faculty and staff). Please log into your FIT Account below to continue.
+                </p>
+                <p>
+                    The FIT Gladys Marcus Library has made this site available to the FIT Community strictly for research and educational purposes. Any usage of material on this site beyond what is permitted by copyright law must first be cleared with the appropriate rights-holder(s).
+                </p>
+                <div class="d-grid mt-4">
+                    <?php echo $this->ssoLoginLinks(['template' => 'common/sso-login-button'], $redirect_url); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</noscript>
+<div id="login-page" style="display: none">
+    <!-- Modal -->
+    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border">
+                <div class="modal-body p-4 p-lg-5">
+                    <div class="container-fluid p-0">
+                        <div class="row justify-content-center">
+                            <div class="col-9 col-sm-7 col-lg-5"><img src="<?php echo $this->assetUrl('img/designer-files-logo.png'); ?>" alt="The FIT Designer Files" class="w-100 mb-4"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="login-head">
+                                <p class="text-center" id="loginLabel">
+                                    This site is restricted to members of the FIT community.
+                                </p>
+                                <p class="text-center">Please log into your FIT Account to continue.</p>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center my-4">
+                            <div class="col-9 col-sm-7 col-lg-5">
+                                <div class="d-grid gap-2">
+                                    <?php echo $this->ssoLoginLinks(['template' => 'common/sso-login-button'], $redirect_url); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <p id="loginRights">
+                                    The FIT Gladys Marcus Library has made this site available to the FIT Community strictly for research and educational purposes. Any usage of material on this site beyond what is permitted by copyright law must first be cleared with the appropriate rights-holder(s).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="flex-shrink-0" id="dummy-content" role="main">
+
+    <div class="container pt-2 pb-3 pt-md-5 pb-md-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h2>
+                    <span class="title">Designer Files</span>
+                </h2>
+                <div class="results">
+                    Showing
+                    53,810 results </div>
+            </div>
+        </div>
+
+        <div class="row mb-5" id="facet-row">
+
+
+            <div class="col-md-4 mb-3">
+                <label for="Designer" class="form-label h5">
+                    Designer </label>
+                <select id="Designer" class="facet-select form-select"
+                    data-placeholder="Select a Designer..." autocomplete="off">
+                    <option
+                        value="http://designerfiles.fitnyc.local/search?limit%5Bitem_set_dcterms_title%5D%5B0%5D=Adele%20Simpson"
+                        data-count="151">
+                        Adele Simpson </option>
+
+
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="Season" class="form-label h5">
+                    Season </label>
+                <select id="Season" class="facet-select form-select"
+                    data-placeholder="Select a Season..." autocomplete="off">
+                    <option
+                        value="http://designerfiles.fitnyc.local/search?limit%5Bfitcore_season%5D%5B0%5D=Cruise/Resort"
+                        data-count="582">
+                        Cruise/Resort </option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="Apparel Type" class="form-label h5">
+                    Apparel Type </label>
+                <select id="Apparel Type" class="facet-select form-select"
+                    data-placeholder="Select a Apparel Type..." autocomplete="off">
+                    <option
+                        value="http://designerfiles.fitnyc.local/search?limit%5Bfitcore_appareltype%5D%5B0%5D=Bags%20(costume%20accessories)"
+                        data-count="3">
+                        Bags (costume accessories) </option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="Publication" class="form-label h5">
+                    Publication </label>
+                <select id="Publication" class="facet-select form-select"
+                    data-placeholder="Select a Publication..." autocomplete="off">
+                    <option
+                        value="http://designerfiles.fitnyc.local/search?limit%5Bdcterms_source%5D%5B0%5D=1001%20Treasures%20of%20Design"
+                        data-count="3">
+                        1001 Treasures of Design </option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label h5">Date</label>
+                <div class="row g-2 g-xl-3">
+                    <div class="col">
+                        <select class="form-select date-select" id="dateRangeMin"
+                            name="date_range_start[]" aria-label="Date Range Start">
+                            <option selected
+                                value="http://designerfiles.fitnyc.local/search?date_range_start%5B%5D=1910&date_range_end%5B%5D=2011">
+                                1910 </option>
+
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <span class="form-control-plaintext">to</span>
+                    </div>
+                    <div class="col">
+                        <select class="form-select date-select" id="dateRangeMax"
+                            name="date_range_end[]" aria-label="Date Range End">
+                            <option selected
+                                value="http://designerfiles.fitnyc.local/search?date_range_start%5B%5D=1910&date_range_end%5B%5D=2011">
+                                2011 </option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label h5">Sort</label>
+                <select id="sort" class="sort-select form-select" data-placeholder="Sort results"
+                    autocomplete="off">
+                    <option value="dcterms_date desc" selected>
+                        Newest to Oldest </option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="col-auto">
+                    <label class="form-label h5">Show Only</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input file-slide-option" type="checkbox"
+                            name="inlineRadioOptions" id="fileoption"
+                            value="http://designerfiles.fitnyc.local/search?limit%5Bitem_set_dcterms_title%5D%5B0%5D=Designer%20Files"
+                            autocomplete='off'>
+                        <label class="form-check-label" for="fileoption">Clippings</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input file-slide-option" type="checkbox"
+                            name="inlineRadioOptions" id="slideoption"
+                            value="http://designerfiles.fitnyc.local/search?limit%5Bitem_set_dcterms_title%5D%5B0%5D=Designer%20Slides"
+                            autocomplete='off'>
+                        <label class="form-check-label" for="slideoption">Runway Slides</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col">
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="container pt-2 pb-3 pt-md-3 pb-md-4">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 align-items-center" id="browse-container" aria-live="polite">
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/7bf4/4d06/99ae/45f1/af7e/c4ee/2e70/878d/lb_ds_wev_000734-1e2a693a-faa9-4dc1-8bf4-121e8b765097/thumbnails/e00418b5-9565-426e-b1e0-bcbfd075c6ce.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/69bf/96ed/905f/4865/bb6e/d8d0/404f/2abf/lb_ds_wev_000733-eb2ea67d-a1bd-4ba1-b47f-97fb10ea0926/thumbnails/f3d56c63-3b1d-47b0-8dfe-48f74c155972.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/3cbf/9869/2472/419f/a3cc/0ffe/af44/2596/lb_ds_wev_000732-283a9d25-20cc-4258-9925-63319452203b/thumbnails/974e3b48-73e6-4064-9e5d-cba00f3d88ea.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/f5b1/49c3/6118/4326/a6ef/efd7/229e/dbcd/lb_ds_wev_000731-878dc65f-73d5-43a6-8a8f-7f6b607b3d49/thumbnails/7c0d39b0-a5f0-4315-848f-4790a75644be.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/0cd2/c5b5/6ae5/4670/baa0/e37a/4817/703a/lb_ds_wev_000730-c3b4b278-e3c8-4f2c-9247-0c72f82ae181/thumbnails/986dbb84-a3a4-44e8-9528-b7cbfd5b9113.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/4f1c/298f/8de0/4dae/b23e/8659/01f8/c615/lb_ds_wev_000729-b81bb118-f24c-4e51-9001-472d5277a8ef/thumbnails/a2016691-b0bb-4cfa-80a7-b3085ba84031.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/cf24/c29f/71ff/46f9/a72f/d29d/1259/6a65/lb_ds_wev_000728-24d1fbd3-1c46-425e-9681-71a5a404ebcc/thumbnails/d5d7cc32-e1c7-48a4-a9aa-899bed5e649b.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/a8ec/ef88/bfb6/4bd1/be04/13e5/ff18/c4b0/lb_ds_wev_000727-a5e713cc-be92-4e8a-8ab8-34d51202ab36/thumbnails/7eb64bac-0128-4514-ae4a-ded09316200c.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/27f4/b613/e6d1/4eb8/b5ae/786a/afbd/10fd/lb_ds_wev_000726-375a2628-3211-4f33-ab78-4999f6e348fb/thumbnails/fc20df70-7d1c-4c8a-943e-daa86ef820ae.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/9171/d497/d111/4067/88a9/e036/d199/7c12/lb_ds_wev_000725-de3c57cc-2c83-402e-9a32-124e17a62532/thumbnails/e9e66f5c-8111-475f-9402-a1b3f81cf4ab.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/2fe2/d93d/90e4/426f/bde8/4730/e5ad/1dec/lb_ds_wev_000724-63be763b-6f08-4f7f-8b54-2d5d5cee90aa/thumbnails/743f22a3-2125-4b91-b87e-4646f51edbbe.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/8bfc/c9a4/e5e2/48ce/943c/7a2c/d7f1/015d/lb_ds_wev_000723-b0544a34-98fc-4a7d-82f9-145bbb708708/thumbnails/1a3edb05-becb-4a3b-b3cf-5e54df7d8d7e.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/c21c/a275/8ef8/47d8/b8c8/c148/3f22/4d3a/lb_ds_wev_000722-c34e4d59-c687-405d-9957-eeef27aea64c/thumbnails/0bbe9005-60d7-4492-a762-96a7316bd13e.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/3253/8364/df49/4a04/804e/11d8/be99/58b5/lb_ds_wev_000721-8f6e88f5-3383-4ef7-a867-a43873bf72b8/thumbnails/68eaa8aa-8f50-453b-b6bb-8f49d04a5a86.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/9dc3/7238/5a79/47a1/b245/2380/4401/5d32/lb_ds_wev_000720-26c9ca88-253f-44aa-9680-e9d815685b03/thumbnails/e9627d40-65fe-41b3-a711-9fea33a4ec8d.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/ee52/c876/3786/4c2c/aeba/aa20/fce2/795e/lb_ds_wev_000719-78df4296-b2d1-403d-b301-f51dd57374e5/thumbnails/b4ce75de-b2d0-4792-aa03-81d6e696f12d.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/b3f2/8ce7/03e4/4fb0/b3ae/c2e7/ea46/f329/lb_ds_wev_000718-ce2900cd-518b-4e60-b278-ba5481b479a1/thumbnails/3886d7fe-c144-4da3-b8d8-7fcb98713c75.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/532a/5958/ef31/490c/bc72/4773/9029/bdb9/lb_ds_wev_000717-632d0bb2-70d2-4031-9204-7114ce504edd/thumbnails/b976483d-6463-4f76-8114-7f4353290339.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/4664/4cae/f59a/46f3/9cb5/27d7/c171/26be/lb_ds_wev_000716-7e8fbb58-3400-4b89-bd91-68692215e37b/thumbnails/1a60f462-9fa9-4513-9b27-b283d4f7abb0.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/df55/a9d0/9d87/4f21/b1f7/ad3f/9ca7/c9ba/lb_ds_wev_000715-04958d9c-22cf-4722-953a-bcf662b783d4/thumbnails/44a04e2c-aefa-43af-839b-486e6d1b2f13.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/0048/af0f/d118/465e/b501/587d/b686/42fd/lb_ds_wev_000714-4e05daaa-9734-43db-ab4a-be71a4a7b1c0/thumbnails/1fe5f356-d877-44c3-9fd0-e030f9b59aa6.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/04c6/331f/5f1f/4823/9371/4734/46d1/006c/lb_ds_wev_000713-b4e2de28-895a-4533-be43-64b60598eb9a/thumbnails/e6a4d293-1b47-4064-ab79-eaf18e5e9eb4.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/0757/3426/44bf/4cac/a05a/ac22/adc0/f548/lb_ds_wev_000712-3b502eeb-4398-442f-b221-2080a54b51d7/thumbnails/88fcc0a9-dee8-447f-8494-eaca5954f150.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/0749/b958/213f/416e/887a/60ce/c035/8c25/lb_ds_wev_000711-dc46cb4a-de46-410c-afbc-fdf4f6e0afc2/thumbnails/43eb6e4e-eb53-42a1-b6e8-a471de99f543.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col item-container">
+                <div class="card border-0 bg-transparent">
+                    <a class="card-img d-flex align-items-center justify-content-center" href=""><img class="browse-thumbnail" alt="Vivienne Westwood, Spring/Summer 2000" src="https://dip-access-bucket.s3.us-east-1.amazonaws.com/packages/95b3/bde6/91e0/430e/a666/f0b9/eb56/bd9f/lb_ds_wev_000710-2dfa3faa-3cc9-448b-9ccd-54286db15c10/thumbnails/4517526f-37eb-42e1-96a5-2932de2a61b8.jpg"></a>
+                    <div class="card-body overflow-hidden px-0">
+                        <h3 class="item-title">
+                            <a class="text-light text-decoration-none" href="">Vivienne Westwood, Spring/Summer 2000</a>
+                        </h3>
+                        <div class="date">
+                            2000 </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container pb-5">
+    </div>
+</div>

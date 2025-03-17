@@ -1,0 +1,89 @@
+<?php
+$this->htmlElement('body')
+    ->appendAttribute('class', 'designer-browse')
+;
+?>
+<div class="row mb-4 pb-2">
+    <div class="col">
+        <?php echo $this->pageTitle('Designers/Brands (A to Z)', 2); ?>
+        <div class="results fs-5 fst-italic">
+            Showing
+            <?php echo number_format($totalResults); ?>
+            <?php echo ($totalResults == 1) ? ' result' : ' results'; ?>
+        </div>
+    </div>
+</div>
+<div class="row pb-0 sticky-md-top bg-body">
+    <div class="col">
+        <ul class="nav nav-underline" id="atoz">
+        </ul>
+    </div>
+</div>
+<div class="row pb-3 pb-md-4" id="listings"></div>
+<button id="top-button" type="button" class="btn btn-outline-light bg-body" title="Go to top">
+    <div class="action-container">
+        Top
+        <i class="fas fa-arrow-up ms-1" aria-hidden="true" title="Go to top"></i>
+    </div>
+</button>
+<script>
+    const data = <?php echo $data; ?>;
+    const keys = Object.keys(data);
+    keys.sort();
+    $(document).ready(function() {
+        keys.forEach(key => {
+            $('#atoz').append(`
+            <li class="nav-item">
+                <a class="nav-link link-light p-0" href="#${key}">${key}</a>
+            </li>
+            `);
+            let section = $(`
+            <div class="card letter-card border-0 pt-5" id="${key}">
+            <h3 class="card-header big-letter display-3 bg-transparent pt-0">${key}</h3>
+            <div class="list-group list-group-flush"></div>
+            </div>
+            `);
+            data[key].forEach(designer => {
+                let description = "";
+                if (designer.description) {
+                    description = `<p class="mb-1">${designer.description}</p>`;
+                } else if (designer.nationality) {
+                    description = `<p class="mb-1">${designer.nationality}</p>`;
+                }
+                section.find('.list-group').append(`
+                <a href="${designer.url}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                    <h5 class="h1 mb-1">${designer.designerName}</h5>
+                    <small class="fst-italic flex-shrink-0">${designer.itemCount} files</small>
+                    </div>
+                    ${description}
+                </a>
+                `);
+            });
+            $('#listings').append(section);
+        });
+        // Scroll to top button
+        let mybutton = $("#top-button");
+
+        mybutton.on("click", topFunction);
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function() {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.fadeIn();
+            } else {
+                mybutton.fadeOut();
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+    });
+</script>

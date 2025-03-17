@@ -11,11 +11,7 @@ $(document).ready(function () {
       },
       onItemAdd: function (value) {
         window.location.href = value;
-      },
-      onInitialize: function () {
-        el.style.visibility = "visible";
-
-      },
+      }
     };
     new TomSelect(el, settings);
   });

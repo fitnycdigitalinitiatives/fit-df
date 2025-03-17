@@ -27,11 +27,16 @@ $sortHeadings = [
       <?php if ($itemSetShow): ?>
         <?php echo $this->pageTitle($itemSet->displayTitle(null, ($filterLocale ? $lang : null)), 2); ?>
       <?php else: ?>
-        <?php echo $this->pageTitle($translate('Files'), 2); ?>
+        <?php echo $this->pageTitle($translate('Designer Files'), 2); ?>
       <?php endif; ?>
+      <div class="results mb-3">
+        Showing
+        <?php echo number_format($totalResults); ?>
+        <?php echo ($totalResults == 1) ? ' result' : ' results'; ?>
+      </div>
     </div>
   </div>
-  <div class="row align-items-center mb-5" id="facet-row">
+  <div class="row mb-5" id="facet-row">
     <?php // check if solr/search module is activated by checking if the helper is present 
     ?>
     <?php if (($totalResults > 0) && ($this->getHelperPluginManager()->has('getFacetsForBrowse')) && (!array_key_exists('scroll_request', $query))): ?>
@@ -49,39 +54,6 @@ $sortHeadings = [
           <?php echo $this->partial('search/facets', ['facets' => $facetsForBrowse['facets'], 'dateFacetStats' => $facetsForBrowse['dateFacetStats'], 'queryParams' => $query, 'firstItem' => null]); ?>
         <?php endif; ?>
       <?php endif; ?>
-    <?php endif; ?>
-  </div>
-  <div class="row align-items-center">
-    <div class="col">
-      <?php if ($totalResults > 0): ?>
-        <?php if ($this->searchFilters() && !$itemSetShow): ?>
-          <div class="results mb-3">
-            Showing
-            <?php echo number_format($totalResults); ?>
-            <?php echo ($totalResults == 1) ? ' item' : ' items'; ?> for:
-            <?php echo $this->searchFilters(); ?>
-          </div>
-        <?php else: ?>
-          <div class="results mb-3">
-            Showing
-            <?php echo number_format($totalResults); ?>
-            <?php echo ($totalResults == 1) ? ' item' : ' items'; ?>
-          </div>
-        <?php endif; ?>
-      <?php else: ?>
-        <div class="results mb-3">
-          Showing 0 results for:
-          <?php echo $this->searchFilters(); ?>
-        </div>
-        <p class="lead">
-          <?php echo $this->translate('We\'re sorry, but your search did not return any items. Please try searching again, or browsing through the items or collections.'); ?>
-        </p>
-      <?php endif; ?>
-    </div>
-    <?php if ($totalResults > 0): ?>
-      <div class="col-12 col-sm-auto">
-        <?php echo $this->sortSelector($sortHeadings); ?>
-      </div>
     <?php endif; ?>
   </div>
 </div>
@@ -122,4 +94,8 @@ $sortHeadings = [
       </div>
     </div>
   <?php endif; ?>
+<?php else: ?>
+  <p class="lead">
+    <?php echo $this->translate('We\'re sorry, but your search did not return any items. Please try searching again, or browsing through the items or collections.'); ?>
+  </p>
 <?php endif; ?>

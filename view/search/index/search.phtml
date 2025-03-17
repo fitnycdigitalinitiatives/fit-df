@@ -35,47 +35,68 @@ $escape = $this->plugin('escapeHtml');
 $this->headScript()
   ->appendFile($this->assetUrl('js/search.js', 'Search'));
 $totalResults = $response->getTotalResults();
+$currentDesignerTitle = "";
+$queryParams = $this->params()->fromQuery();
+if (array_key_exists('limit', $queryParams) && array_key_exists("item_set_dcterms_title", $queryParams['limit'])) {
+  foreach ($queryParams['limit']["item_set_dcterms_title"] as $item_set_dcterms_title) {
+    if ($item_set_dcterms_title != "Runway Slides" && $item_set_dcterms_title != "Designer Clippings") {
+      $currentDesignerSet = $this->api()->searchOne('item_sets', [
+        'property' => [
+          [
+            'property' => 'dcterms:title',
+            'type' => 'eq',
+            'text' => $item_set_dcterms_title,
+          ],
+        ],
+      ])->getContent();
+      if ($currentDesignerSet) {
+        $currentDesignerTitle = $currentDesignerSet->displayTitle();
+        $currentDesignerWikipedia = "";
+        foreach ($currentDesignerSet->value('dcterms:relation', ['all' => true, 'type' => 'uri']) as $relation) {
+          if (strtolower($relation->value()) == 'wikipedia') {
+            $currentDesignerWikipedia = $relation->uri();
+            break;
+          }
+        }
+        $currentDesignerDescription = $currentDesignerSet->displayDescription() ? $currentDesignerSet->displayDescription() : $currentDesignerSet->value('fitcore:nationality');
+      }
+    }
+  }
+}
 ?>
 
 <div class="container pt-2 pb-3 pt-md-5 pb-md-4">
-  <div class="row">
-    <div class="col">
-      <?php echo $this->pageTitle($this->translate('Files'), 2); ?>
-      <?php echo $this->messages(); ?>
+  <div class="row mb-4">
+    <div class="col" id="search-header">
+      <?php if ($currentDesignerTitle): ?>
+        <div class="d-flex">
+          <?php echo $this->pageTitle($currentDesignerTitle, 2); ?>
+          <?php if ($currentDesignerWikipedia): ?>
+            <a href="<?php echo $currentDesignerWikipedia; ?>" target="_blank" class="link-light ms-2" aria-label="Read more about this designer/brand on Wikipedia">
+              <i class="fas fa-info-circle" title="Read more about this designer/brand on Wikipedia" aria-hidden="true"></i>
+            </a>
+          <?php endif; ?>
+        </div>
+        <?php if ($currentDesignerDescription): ?>
+          <p class="mb-0">
+            <?php echo $currentDesignerDescription; ?>
+          </p>
+        <?php endif; ?>
+      <?php else: ?>
+        <?php echo $this->pageTitle($this->translate('Designer Files'), 2); ?>
+      <?php endif; ?>
+      <div class="results mt-2">
+        Showing
+        <?php echo number_format($totalResults); ?>
+        <?php echo ($totalResults > 1) ? ' results' : ' result'; ?>
+      </div>
     </div>
   </div>
 
   <?php if (isset($response)): ?>
     <?php if ($totalResults > 0): ?>
-      <div class="row align-items-center mb-5" id="facet-row">
-        <?php echo $this->partial('search/facets', ['facets' => $facets, 'dateFacetStats' => $dateFacetStats, 'queryParams' => $this->params()->fromQuery(), 'firstItem' => $this->api()->read('items', $response->getResults('items')[0]['id'])->getContent()]); ?>
-      </div>
-      <div class="row align-items-center">
-        <div class="col">
-          <div class="results">
-            Showing
-            <?php echo number_format($totalResults); ?>
-            <?php echo ($totalResults > 1) ? ' results' : ' result'; ?>
-            <?php echo $this->QueryToStringHelper($this->params()->fromQuery(), $this->params()->fromRoute(), $this->searchForm()); ?>
-          </div>
-        </div>
-        <div class="col-12 col-sm-auto">
-          <form class="input-group" id="search-results-sort">
-            <?php if ($sortOptions):
-              $sortSelect = new Laminas\Form\Element\Select('sort');
-              $sortSelect->setValueOptions($sortOptions);
-              $sortSelect->setValue($query->getSort());
-              $sortSelect->setAttributes(['class' => 'form-select', 'aria-label' => 'Sort by']);
-            endif; ?>
-            <?php if (!empty($sortSelect)): ?>
-              <span class="input-group-text">
-                <i class="fas fa-sort" aria-hidden="true" title="<?php echo 'Sort'; ?>">
-                </i>
-              </span>
-              <?php echo $this->formSelect($sortSelect); ?>
-            <?php endif; ?>
-          </form>
-        </div>
+      <div class="row" id="facet-row">
+        <?php echo $this->partial('search/facets', ['facets' => $facets, 'dateFacetStats' => $dateFacetStats, 'queryParams' => $queryParams, 'firstItem' => $this->api()->read('items', $response->getResults('items')[0]['id'])->getContent(), 'sortOptions' => $sortOptions, 'currentSort' => $query->getSort()]); ?>
       </div>
 
     <?php else: ?>
@@ -83,7 +104,6 @@ $totalResults = $response->getTotalResults();
         <div class="col">
           <div class="results">
             Showing 0 results
-            <?php echo $this->QueryToStringHelper($this->params()->fromQuery(), $this->params()->fromRoute(), $this->searchForm()); ?>
           </div>
           <p class="lead">
             <?php echo $this->translate('We\'re sorry, but your search did not return any results. Please try searching again, or browsing through the items or collections.'); ?>
@@ -95,16 +115,7 @@ $totalResults = $response->getTotalResults();
   <?php endif; ?>
 </div>
 
-<?php if (isset($response) && ($response->getTotalResults() > 0)): ?>
-  <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
-  <?php echo $this->partial('search/resource-list', [
-    'response' => $response,
-    'resourceName' => 'item_sets',
-    'site' => $site,
-  ]);
-  ?>
-
-  <?php $itemsCount = $response->getResourceTotalResults('items'); ?>
+<?php if (isset($response) && ($totalResults > 0)): ?>
   <?php echo $this->partial('search/resource-list', [
     'response' => $response,
     'resourceName' => 'items',
@@ -112,26 +123,6 @@ $totalResults = $response->getTotalResults();
   ]); ?>
 
   <?php
-  echo $this->partial('search/results-footer', [
-    'query' => $query,
-    'response' => $response,
-    'sortOptions' => $sortOptions,
-  ]);
+  echo $this->partial('search/results-footer');
   ?>
 <?php endif; ?>
-
-<script>
-  $(document).ready(function() {
-
-    $('#search-results-sort select').on('change', function() {
-      Search.sortBy($(this).val());
-    });
-    $('.expander').on("click", function() {
-      if ($(this).attr('aria-expanded') == "true") {
-        $(this).text("Less");
-      } else {
-        $(this).text("More");
-      }
-    });
-  });
-</script>
