@@ -43,7 +43,7 @@ $this->htmlElement('body')
             <div class="list-group list-group-flush"></div>
             </div>
             `);
-            data[key].sort((a, b) => (a.designerName > b.designerName) ? 1 : ((b.designerName > a.designerName) ? -1 : 0));
+            data[key].sort((a, b) => (a.designerName.toUpperCase() > b.designerName.toUpperCase()) ? 1 : ((b.designerName.toUpperCase() > a.designerName.toUpperCase()) ? -1 : 0));
             data[key].forEach(designer => {
                 let description = "";
                 if (designer.description) {

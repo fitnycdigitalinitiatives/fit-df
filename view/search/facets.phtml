@@ -129,7 +129,7 @@ if (array_key_exists('limit', $queryParams)) {
       <label for="<?php echo $this->facetLabel($name); ?>" class="form-label h5">
         <?php echo $this->facetLabel($name); ?>
       </label>
-      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?>>
+      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?> size="1" style="opacity: 0;">
         <?php foreach ($currentValues as $currentValue): ?>
           <option selected value="<?php echo $currentValue['facetLink']; ?>">
             <?php echo $currentValue['value']; ?>
@@ -188,7 +188,7 @@ if (array_key_exists('limit', $queryParams)) {
     $rangeURIqueriesArray = $rangeURI->getQueryAsArray();
     ?>
     <div class="row g-2 g-xl-3">
-      <div class="col"><select class="form-select date-select" id="dateRangeMin" name="date_range_start[]" aria-label="Date Range Start" <?php echo $disabled ? "disabled" : ""; ?>>
+      <div class="col"><select class="form-select date-select" id="dateRangeMin" name="date_range_start[]" aria-label="Date Range Start" <?php echo $disabled ? "disabled" : ""; ?> style="opacity: 0;">
           <?php for ($i = $totalMin; $i <= $currentMax && $i != 0; ++$i): ?>
             <?php
             $rangeURIqueriesArray["date_range_start[]"] = $i;
@@ -201,7 +201,7 @@ if (array_key_exists('limit', $queryParams)) {
           <?php endfor; ?>
         </select></div>
       <div class="col-auto"><span class="form-control-plaintext">to</span></div>
-      <div class="col"><select class="form-select date-select" id="dateRangeMax" name="date_range_end[]" aria-label="Date Range End" <?php echo $disabled ? "disabled" : ""; ?>>
+      <div class="col"><select class="form-select date-select" id="dateRangeMax" name="date_range_end[]" aria-label="Date Range End" <?php echo $disabled ? "disabled" : ""; ?> style="opacity: 0;">
           <?php for ($i = $currentMin; $i <= $totalMax && $i != 0; ++$i): ?>
             <?php
             $rangeURIqueriesArray["date_range_start[]"] = $currentMin;
@@ -218,7 +218,7 @@ if (array_key_exists('limit', $queryParams)) {
   </div>
   <div class="col-md-4 mb-3">
     <label class="form-label h5">Sort</label>
-    <select id="sort" class="sort-select form-select" autocomplete="off">
+    <select id="sort" class="sort-select form-select" autocomplete="off" style="opacity: 0;">
       <?php foreach ($sortOptions as $value => $sortOptionLabel): ?>
         <option value="<?php echo $value; ?>" <?php echo $value == $currentSort ? "selected" : ""; ?>>
           <?php echo $sortOptionLabel; ?>
