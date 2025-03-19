@@ -126,10 +126,10 @@ if (array_key_exists('limit', $queryParams)) {
     }
     ?>
     <div class="col-md-4 mb-3">
-      <label for="<?php echo $this->facetLabel($name); ?>" class="form-label h5">
+      <div class="form-label h5">
         <?php echo $this->facetLabel($name); ?>
-      </label>
-      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?> size="1" style="opacity: 0;">
+      </div>
+      <select id="<?php echo $this->facetLabel($name); ?>" class="facet-select form-select" data-placeholder="<?php echo $placeholder; ?>" autocomplete="off" multiple <?php echo $disabled ? "disabled" : ""; ?> size="1" style="opacity: 0;" aria-label="<?php echo $this->facetLabel($name); ?>">
         <?php foreach ($currentValues as $currentValue): ?>
           <option selected value="<?php echo $currentValue['facetLink']; ?>">
             <?php echo $currentValue['value']; ?>
@@ -152,7 +152,7 @@ if (array_key_exists('limit', $queryParams)) {
     </div>
   <?php endforeach; ?>
   <div class="col-md-4 mb-3">
-    <label class="form-label h5">Date</label>
+    <div class="form-label h5">Date</div>
     <?php
     $currentMin = 0;
     $currentMax = 0;
@@ -217,8 +217,8 @@ if (array_key_exists('limit', $queryParams)) {
     </div>
   </div>
   <div class="col-md-4 mb-3">
-    <label class="form-label h5">Sort</label>
-    <select id="sort" class="sort-select form-select" autocomplete="off" style="opacity: 0;">
+    <div class="form-label h5">Sort</div>
+    <select id="sort" class="sort-select form-select" autocomplete="off" style="opacity: 0;" aria-label="sort">
       <?php foreach ($sortOptions as $value => $sortOptionLabel): ?>
         <option value="<?php echo $value; ?>" <?php echo $value == $currentSort ? "selected" : ""; ?>>
           <?php echo $sortOptionLabel; ?>
@@ -229,7 +229,7 @@ if (array_key_exists('limit', $queryParams)) {
   <div class="col-12">
     <div class="row justify-content-between">
       <div class="col-auto">
-        <label class="form-label h5 d-block">Show Only</label>
+        <div class="form-label h5 d-block">Show Only</div>
         <div class="form-check form-check-inline">
           <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="clippingoption"
             value="<?php echo $clippingLink; ?>" <?php echo $clippingSelected ? "checked" : ""; ?> <?php echo $clippingSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>

@@ -104,7 +104,7 @@ foreach ($itemSets as $key => $itemSet) {
             <?php foreach ($designerSets as $designerSet): ?>
               <dd class="value">
                 <?php echo $escape($designerSet->displayTitle()); ?>
-                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$designerSet->displayTitle()]]]]);; ?>" class="link-light ms-1">
+                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$designerSet->displayTitle()]]]]);; ?>" class="link-light ms-1" aria-label="Search for this designer/brand">
                   <i class="fas fa-search" title="Search for this designer/brand" aria-hidden="true"></i>
                 </a>
                 <?php foreach ($designerSet->value('dcterms:relation', ['all' => true, 'type' => 'uri']) as $relation): ?>
@@ -129,7 +129,7 @@ foreach ($itemSets as $key => $itemSet) {
             <?php foreach ($itemSets as $itemSet): ?>
               <dd class="value">
                 <?php echo $escape($itemSet->displayTitle()); ?>
-                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$itemSet->displayTitle()]]]]);; ?>" class="ms-1">
+                <a href="<?php echo $this->url('site/search', ['site-slug' => $this->currentSite()->slug()], ['query' => ['limit' => ['item_set_dcterms_title' => [$itemSet->displayTitle()]]]]);; ?>" class="ms-1" aria-label="Search for this collection">
                   <i class="fas fa-search" title="Search for this collection" aria-hidden="true"></i>
                 </a>
               </dd>
