@@ -46,7 +46,7 @@ if (array_key_exists('limit', $queryParams)) {
         $currentValues[] = ['value' => $queryFacet, 'facetLink' => $this->facetLink($name, ['value' => $queryFacet, 'count' => null])];
       }
     }
-    $placeholder = "Select a " . $this->facetLabel($name) . "...";
+    $placeholder = "Select or type " . (str_starts_with($this->facetLabel($name), "A") ? "an " : "a ") . $this->facetLabel($name) . "...";
     $disabled = false;
     if ((count($currentValues) == 0) && (count($facetValues) == 0)) {
       $placeholder = "Not available for these results.";
