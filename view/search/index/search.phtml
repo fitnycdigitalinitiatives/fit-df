@@ -88,7 +88,7 @@ if (array_key_exists('limit', $queryParams) && array_key_exists("item_set_dcterm
       <div class="results mt-2">
         Showing
         <?php echo number_format($totalResults); ?>
-        <?php echo ($totalResults > 1) ? ' results' : ' result'; ?>
+        <?php echo ($totalResults > 1 || $totalResults == 0) ? ' results' : ' result'; ?>
       </div>
     </div>
   </div>
@@ -102,9 +102,6 @@ if (array_key_exists('limit', $queryParams) && array_key_exists("item_set_dcterm
     <?php else: ?>
       <div class="row">
         <div class="col">
-          <div class="results">
-            Showing 0 results
-          </div>
           <p class="lead">
             <?php echo $this->translate('We\'re sorry, but your search did not return any results. Please try searching again, or browsing through the items or collections.'); ?>
           </p>
