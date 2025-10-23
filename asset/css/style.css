@@ -679,7 +679,7 @@ footer #fit-logo {
 
 
 .item.resource.show .openseadragon-frame {
-  padding-bottom: 56.25%;
+  --viewer-aspect-ratio: 56.25%;
   background-color: #1b1f22;
   border: var(--bs-border-width) solid var(--bs-border-color);
   border-radius: var(--bs-border-radius);
