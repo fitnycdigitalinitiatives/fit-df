@@ -689,23 +689,6 @@ footer #fit-logo {
   outline: none;
 }
 
-
-.item.resource.show .openseadragon>.openseadragon-container>div:not(.openseadragon-canvas) {
-  margin: .25rem !important;
-}
-
-@media (min-width:768px) {
-  .item.resource.show .openseadragon>.openseadragon-container>div:not(.openseadragon-canvas) {
-    margin: .5rem !important;
-  }
-}
-
-@media (min-width:992px) {
-  .item.resource.show .openseadragon>.openseadragon-container>div:not(.openseadragon-canvas) {
-    margin: 1rem !important;
-  }
-}
-
 @media (max-width:767px) {
   .item.resource.show .tooltip {
     display: none;
