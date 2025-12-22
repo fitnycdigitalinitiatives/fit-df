@@ -77,7 +77,6 @@ if (array_key_exists('limit', $queryParams)) {
           unset($thisArray['limit'][$name][array_search('Runway Slides', $thisArray['limit'][$name])]);
           $clippingLink = $uri->setQuery($thisArray);
           if ($this->getCountForQuery($thisArray) == 0) {
-            echo json_encode($thisArray);
             $clippingSlideDisabled = true;
           }
         } elseif ($currentValue['value'] == "Designer Clippings") {
