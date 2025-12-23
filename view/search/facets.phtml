@@ -53,54 +53,100 @@ if (array_key_exists('limit', $queryParams)) {
       $disabled = true;
     }
     if ($name == "item_set_dcterms_title") {
-      $hasClippingSlideOptions = false;
-      $clippingSlideDisabled = false;
+      $hasClippingRunwayLookbookOptions = false;
+      $clippingDisabled = false;
+      $runwayDisabled = false;
+      $lookbookDisabled = false;
       $clippingSelected = false;
-      $slideSelected = false;
-      $slideLink = "";
+      $runwaySelected = false;
+      $lookbookSelected = false;
+      $runwayLink = "";
       $clippingLink = "";
+      $lookbookLink = "";
       foreach ($facetValues as $facetValueKey => $facetValue) {
-        if ($facetValue["value"] == "Runway Slides" || $facetValue["value"] == "Designer Clippings") {
-          $hasClippingSlideOptions = true;
+        if ($facetValue["value"] == "Runway Slides") {
+          $hasClippingRunwayLookbookOptions = true;
           unset($facetValues[$facetValueKey]);
-          $slideLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
+          $runwayLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
+        } elseif ($facetValue["value"] == "Designer Clippings") {
+          $hasClippingRunwayLookbookOptions = true;
+          unset($facetValues[$facetValueKey]);
           $clippingLink = $this->facetLink($name, ['value' => "Designer Clippings", 'count' => null]);
+        } elseif ($facetValue["value"] == "Lookbooks") {
+          $hasClippingRunwayLookbookOptions = true;
+          unset($facetValues[$facetValueKey]);
+          $lookbookLink = $this->facetLink($name, ['value' => "Lookbooks", 'count' => null]);
         }
       }
       foreach ($currentValues as $currentValueKey => $currentValue) {
         if ($currentValue['value'] == "Runway Slides") {
-          $slideSelected = true;
+          $runwaySelected = true;
           unset($currentValues[$currentValueKey]);
-          $slideLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
-          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Clippings", 'count' => null])));
-          $thisArray = $uri->getQueryAsArray();
-          unset($thisArray['limit'][$name][array_search('Runway Slides', $thisArray['limit'][$name])]);
-          $clippingLink = $uri->setQuery($thisArray);
-          if ($this->getCountForQuery($thisArray) == 0) {
-            $clippingSlideDisabled = true;
+          $runwayLink = $this->facetLink($name, ['value' => "Runway Slides", 'count' => null]);
+          $clippingUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Clippings", 'count' => null])));
+          $clippingArray = $clippingUri->getQueryAsArray();
+          unset($clippingArray['limit'][$name][array_search('Runway Slides', $clippingArray['limit'][$name])]);
+          $clippingLink = $clippingUri->setQuery($clippingArray);
+          if ($this->getCountForQuery($clippingArray) == 0) {
+            $clippingDisabled = true;
+          }
+          $lookbookUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Lookbooks", 'count' => null])));
+          $lookbookArray = $lookbookUri->getQueryAsArray();
+          unset($lookbookArray['limit'][$name][array_search('Runway Slides', $lookbookArray['limit'][$name])]);
+          $lookbookLink = $lookbookUri->setQuery($lookbookArray);
+          if ($this->getCountForQuery($lookbookArray) == 0) {
+            $lookbookDisabled = true;
           }
         } elseif ($currentValue['value'] == "Designer Clippings") {
           $clippingSelected = true;
           unset($currentValues[$currentValueKey]);
           $clippingLink = $this->facetLink($name, ['value' => "Designer Clippings", 'count' => null]);
-          $uri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Runway Slides", 'count' => null])));
-          $thisArray = $uri->getQueryAsArray();
-          unset($thisArray['limit'][$name][array_search('Designer Clippings', $thisArray['limit'][$name])]);
-          $slideLink = $uri->setQuery($thisArray);
-          if ($this->getCountForQuery($thisArray) == 0) {
-            $clippingSlideDisabled = true;
+          $runwayUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Runway Slides", 'count' => null])));
+          $runwayArray = $runwayUri->getQueryAsArray();
+          unset($runwayArray['limit'][$name][array_search('Designer Clippings', $runwayArray['limit'][$name])]);
+          $runwayLink = $runwayUri->setQuery($runwayArray);
+          if ($this->getCountForQuery($runwayArray) == 0) {
+            $runwayDisabled = true;
+          }
+          $lookbookUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Lookbooks", 'count' => null])));
+          $lookbookArray = $lookbookUri->getQueryAsArray();
+          unset($lookbookArray['limit'][$name][array_search('Designer Clippings', $lookbookArray['limit'][$name])]);
+          $lookbookLink = $lookbookUri->setQuery($lookbookArray);
+          if ($this->getCountForQuery($lookbookArray) == 0) {
+            $lookbookDisabled = true;
+          }
+        } elseif ($currentValue['value'] == "Lookbooks") {
+          $lookbookSelected = true;
+          unset($currentValues[$currentValueKey]);
+          $lookbookLink = $this->facetLink($name, ['value' => "Lookbooks", 'count' => null]);
+          $runwayUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Runway Slides", 'count' => null])));
+          $runwayArray = $runwayUri->getQueryAsArray();
+          unset($runwayArray['limit'][$name][array_search('Lookbooks', $runwayArray['limit'][$name])]);
+          $runwayLink = $runwayUri->setQuery($runwayArray);
+          if ($this->getCountForQuery($runwayArray) == 0) {
+            $runwayDisabled = true;
+          }
+          $clippingUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Clippings", 'count' => null])));
+          $clippingArray = $clippingUri->getQueryAsArray();
+          unset($clippingArray['limit'][$name][array_search('Lookbooks', $clippingArray['limit'][$name])]);
+          $clippingLink = $clippingUri->setQuery($clippingArray);
+          if ($this->getCountForQuery($clippingArray) == 0) {
+            $clippingDisabled = true;
           }
         }
       }
-      if (!$hasClippingSlideOptions && !$slideSelected && !$clippingSelected) {
-        $clippingSlideDisabled = true;
+      if (!$hasClippingRunwayLookbookOptions && !$runwaySelected && !$clippingSelected && !$lookbookSelected) {
+        $clippingSlideLookbookDisabled = true;
         if ($firstItem) {
           foreach ($firstItem->itemSets() as $itemSet) {
             if ($itemSet->displayTitle() == "Runway Slides") {
-              $slideSelected = true;
+              $runwaySelected = true;
               break;
             } elseif ($itemSet->displayTitle() == "Designer Clippings") {
               $clippingSelected = true;
+              break;
+            } elseif ($itemSet->displayTitle() == "Lookbooks") {
+              $lookbookSelected = true;
               break;
             }
           }
@@ -231,13 +277,18 @@ if (array_key_exists('limit', $queryParams)) {
         <div class="form-label h5 d-block">Show Only</div>
         <div class="form-check form-check-inline">
           <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="clippingoption"
-            value="<?php echo $clippingLink; ?>" <?php echo $clippingSelected ? "checked" : ""; ?> <?php echo $clippingSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+            value="<?php echo $clippingLink; ?>" <?php echo $clippingSelected ? "checked" : ""; ?> <?php echo ($clippingDisabled || !$clippingLink) ? "disabled" : ""; ?> autocomplete='off'>
           <label class="form-check-label" for="clippingoption">Designer Clippings</label>
         </div>
         <div class="form-check form-check-inline">
           <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="slideoption"
-            value="<?php echo $slideLink; ?>" <?php echo $slideSelected ? "checked" : ""; ?> <?php echo $clippingSlideDisabled ? "disabled" : ""; ?> autocomplete='off'>
+            value="<?php echo $runwayLink; ?>" <?php echo $runwaySelected ? "checked" : ""; ?> <?php echo ($runwayDisabled || !$runwayLink) ? "disabled" : ""; ?> autocomplete='off'>
           <label class="form-check-label" for="slideoption">Runway Slides</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="lookbookoption"
+            value="<?php echo $lookbookLink; ?>" <?php echo $lookbookSelected ? "checked" : ""; ?> <?php echo ($lookbookDisabled || !$lookbookLink) ? "disabled" : ""; ?> autocomplete='off'>
+          <label class="form-check-label" for="lookbookoption">Lookbooks</label>
         </div>
       </div>
       <?php if ($queryParams): ?>
