@@ -521,6 +521,12 @@ footer #fit-logo {
   }
 }
 
+@media (min-width:768px) {
+  #show-only {
+    margin-bottom: 12px;
+  }
+}
+
 @media (min-width:992px) {
   #facet-row .label-col {
     order: -1;

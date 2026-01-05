@@ -57,12 +57,15 @@ if (array_key_exists('limit', $queryParams)) {
       $clippingDisabled = false;
       $runwayDisabled = false;
       $lookbookDisabled = false;
+      $streetstyleDisabled = false;
       $clippingSelected = false;
       $runwaySelected = false;
       $lookbookSelected = false;
+      $streetstyleSelected = false;
       $runwayLink = "";
       $clippingLink = "";
       $lookbookLink = "";
+      $streetstyleLink = "";
       foreach ($facetValues as $facetValueKey => $facetValue) {
         if ($facetValue["value"] == "Runway Slides") {
           $hasClippingRunwayLookbookOptions = true;
@@ -76,6 +79,10 @@ if (array_key_exists('limit', $queryParams)) {
           $hasClippingRunwayLookbookOptions = true;
           unset($facetValues[$facetValueKey]);
           $lookbookLink = $this->facetLink($name, ['value' => "Lookbooks", 'count' => null]);
+        } elseif ($facetValue["value"] == "Street Style Slides") {
+          $hasClippingRunwayLookbookOptions = true;
+          unset($facetValues[$facetValueKey]);
+          $streetstyleLink = $this->facetLink($name, ['value' => "Street Style Slides", 'count' => null]);
         }
       }
       foreach ($currentValues as $currentValueKey => $currentValue) {
@@ -97,6 +104,13 @@ if (array_key_exists('limit', $queryParams)) {
           if ($this->getCountForQuery($lookbookArray) == 0) {
             $lookbookDisabled = true;
           }
+          $streetstyleUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Street Style Slides", 'count' => null])));
+          $streetstyleArray = $streetstyleUri->getQueryAsArray();
+          unset($streetstyleArray['limit'][$name][array_search('Runway Slides', $streetstyleArray['limit'][$name])]);
+          $streetstyleLink = $streetstyleUri->setQuery($streetstyleArray);
+          if ($this->getCountForQuery($streetstyleArray) == 0) {
+            $streetstyleDisabled = true;
+          }
         } elseif ($currentValue['value'] == "Designer Clippings") {
           $clippingSelected = true;
           unset($currentValues[$currentValueKey]);
@@ -114,6 +128,13 @@ if (array_key_exists('limit', $queryParams)) {
           $lookbookLink = $lookbookUri->setQuery($lookbookArray);
           if ($this->getCountForQuery($lookbookArray) == 0) {
             $lookbookDisabled = true;
+          }
+          $streetstyleUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Street Style Slides", 'count' => null])));
+          $streetstyleArray = $streetstyleUri->getQueryAsArray();
+          unset($streetstyleArray['limit'][$name][array_search('Designer Clippings', $streetstyleArray['limit'][$name])]);
+          $streetstyleLink = $streetstyleUri->setQuery($streetstyleArray);
+          if ($this->getCountForQuery($streetstyleArray) == 0) {
+            $streetstyleDisabled = true;
           }
         } elseif ($currentValue['value'] == "Lookbooks") {
           $lookbookSelected = true;
@@ -133,9 +154,41 @@ if (array_key_exists('limit', $queryParams)) {
           if ($this->getCountForQuery($clippingArray) == 0) {
             $clippingDisabled = true;
           }
+          $streetstyleUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Street Style Slides", 'count' => null])));
+          $streetstyleArray = $streetstyleUri->getQueryAsArray();
+          unset($streetstyleArray['limit'][$name][array_search('Lookbooks', $streetstyleArray['limit'][$name])]);
+          $streetstyleLink = $streetstyleUri->setQuery($streetstyleArray);
+          if ($this->getCountForQuery($streetstyleArray) == 0) {
+            $streetstyleDisabled = true;
+          }
+        } elseif ($currentValue['value'] == "Street Style Slides") {
+          $streetstyleSelected = true;
+          unset($currentValues[$currentValueKey]);
+          $streetstyleLink = $this->facetLink($name, ['value' => "Street Style Slides", 'count' => null]);
+          $runwayUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Runway Slides", 'count' => null])));
+          $runwayArray = $runwayUri->getQueryAsArray();
+          unset($runwayArray['limit'][$name][array_search('Street Style Slides', $runwayArray['limit'][$name])]);
+          $runwayLink = $runwayUri->setQuery($runwayArray);
+          if ($this->getCountForQuery($runwayArray) == 0) {
+            $runwayDisabled = true;
+          }
+          $clippingUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Designer Clippings", 'count' => null])));
+          $clippingArray = $clippingUri->getQueryAsArray();
+          unset($clippingArray['limit'][$name][array_search('Street Style Slides', $clippingArray['limit'][$name])]);
+          $clippingLink = $clippingUri->setQuery($clippingArray);
+          if ($this->getCountForQuery($clippingArray) == 0) {
+            $clippingDisabled = true;
+          }
+          $lookbookUri = UriFactory::factory(htmlspecialchars_decode($this->facetLink($name, ['value' => "Lookbooks", 'count' => null])));
+          $lookbookArray = $lookbookUri->getQueryAsArray();
+          unset($lookbookArray['limit'][$name][array_search('Street Style Slides', $lookbookArray['limit'][$name])]);
+          $lookbookLink = $lookbookUri->setQuery($lookbookArray);
+          if ($this->getCountForQuery($lookbookArray) == 0) {
+            $lookbookDisabled = true;
+          }
         }
       }
-      if (!$hasClippingRunwayLookbookOptions && !$runwaySelected && !$clippingSelected && !$lookbookSelected) {
+      if (!$hasClippingRunwayLookbookOptions && !$runwaySelected && !$clippingSelected && !$lookbookSelected && !$streetstyleSelected) {
         $clippingSlideLookbookDisabled = true;
         if ($firstItem) {
           foreach ($firstItem->itemSets() as $itemSet) {
@@ -147,6 +200,9 @@ if (array_key_exists('limit', $queryParams)) {
               break;
             } elseif ($itemSet->displayTitle() == "Lookbooks") {
               $lookbookSelected = true;
+              break;
+            } elseif ($itemSet->displayTitle() == "Street Style Slides") {
+              $streetstyleSelected = true;
               break;
             }
           }
@@ -258,23 +314,22 @@ if (array_key_exists('limit', $queryParams)) {
             </option>
           <?php endfor; ?>
         </select></div>
-
     </div>
-  </div>
-  <div class="col-md-4 mb-3">
-    <div class="form-label h5">Sort</div>
-    <select id="sort" class="sort-select form-select" autocomplete="off" style="opacity: 0;" aria-label="sort">
-      <?php foreach ($sortOptions as $value => $sortOptionLabel): ?>
-        <option value="<?php echo $value; ?>" <?php echo $value == $currentSort ? "selected" : ""; ?>>
-          <?php echo $sortOptionLabel; ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
   </div>
   <div class="col-12">
     <div class="row justify-content-between">
-      <div class="col-auto">
-        <div class="form-label h5 d-block">Show Only</div>
+      <div class="col-md-4 order-md-last mb-3 mb-md-0">
+        <div class="form-label h5">Sort</div>
+        <select id="sort" class="sort-select form-select" autocomplete="off" style="opacity: 0;" aria-label="sort">
+          <?php foreach ($sortOptions as $value => $sortOptionLabel): ?>
+            <option value="<?php echo $value; ?>" <?php echo $value == $currentSort ? "selected" : ""; ?>>
+              <?php echo $sortOptionLabel; ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col">
+        <div class="form-label h5 d-block" id="show-only">Show Only</div>
         <div class="form-check form-check-inline">
           <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="clippingoption"
             value="<?php echo $clippingLink; ?>" <?php echo $clippingSelected ? "checked" : ""; ?> <?php echo ($clippingDisabled || !$clippingLink) ? "disabled" : ""; ?> autocomplete='off'>
@@ -290,14 +345,21 @@ if (array_key_exists('limit', $queryParams)) {
             value="<?php echo $lookbookLink; ?>" <?php echo $lookbookSelected ? "checked" : ""; ?> <?php echo ($lookbookDisabled || !$lookbookLink) ? "disabled" : ""; ?> autocomplete='off'>
           <label class="form-check-label" for="lookbookoption">Lookbooks</label>
         </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input clipping-slide-option" type="checkbox" name="inlineRadioOptions" id="streetstyleoption"
+            value="<?php echo $streetstyleLink; ?>" <?php echo $streetstyleSelected ? "checked" : ""; ?> <?php echo ($streetstyleDisabled || !$streetstyleLink) ? "disabled" : ""; ?> autocomplete='off'>
+          <label class="form-check-label" for="streetstyleoption">Street Style Slides</label>
+        </div>
       </div>
-      <?php if ($queryParams): ?>
+    </div>
+    <?php if ($queryParams): ?>
+      <div class="row justify-content-end mt-1">
         <div class="col-auto">
           <button id="reset-filters" class="p-0 bg-transparent border-0 link-light fs-6">
             Reset filters
           </button>
         </div>
-      <?php endif; ?>
-    </div>
+      </div>
+    <?php endif; ?>
   </div>
 <?php endif; ?>
