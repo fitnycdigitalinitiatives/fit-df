@@ -23,6 +23,12 @@ class CitationHelper extends AbstractHelper
       } elseif ($itemSetTitle == "Designer Clippings") {
         $type = "Designer Clippings";
         break;
+      } elseif ($itemSetTitle == "Street Style Slides") {
+        $type = "Street Style Slides";
+        break;
+      } elseif ($itemSetTitle == "Lookbooks") {
+        $type = "Lookbooks";
+        break;
       }
     }
     switch ($type) {
@@ -59,6 +65,40 @@ class CitationHelper extends AbstractHelper
         $mla = $mlaPhotographer . $titleCased . ' Runway Photo. ' . $date . '. The FIT Designer Files, ' . $url;
         break;
 
+      case 'Street Style Slides':
+        $apaPhotographer = '';
+        $chicagoPhotographer = '';
+        $mlaPhotographer = '';
+        foreach ($item->value('dcterms:contributor', ['all' => true]) as $contributor) {
+          if (str_contains($contributor->asHtml(), 'Photographer')) {
+            $photographer = $contributor;
+            $lastName = trim(explode(",", $photographer)[0]);
+            $firstAndMiddle = trim(explode(",", $photographer)[1]);
+            $firstAndMiddleArray = explode(' ', $firstAndMiddle);
+            $initials = '';
+            foreach ($firstAndMiddleArray as $initialKey => $part) {
+              if ($initialKey == 0) {
+                $initials .= strtoupper($part[0]) . '.';
+              } else {
+                $initials .= ' ' . strtoupper($part[0]) . '.';
+              }
+            }
+            $apaPhotographer .= $lastName . ', ' . $initials . '. ';
+            $chicagoPhotographer .= $photographer . '. ';
+            $mlaPhotographer .= $photographer . '. ';
+            break;
+          }
+        }
+        if ($apaPhotographer) {
+          $apa = $apaPhotographer . '(' . $date . '). ' . $title . ' [Street Style photo]. <em>The FIT Designer Files</em>. ' . $url;
+        } else {
+          $apa = $title . ' [Street Style photo]. (' . $date . ')' . '. <em>The FIT Designer Files</em>. ' . $url;
+        }
+        $chicago = $chicagoPhotographer . '<em>' . $titleCased . '</em>. ' . $date . '. Street Style photo. The FIT Designer Files. ' . $url;
+        $mla = $mlaPhotographer . $titleCased . ' Street Style Photo. ' . $date . '. The FIT Designer Files, ' . $url;
+        break;
+
+
       case 'Designer Clippings':
         $source = $item->value('dcterms:source');
         if ($source) {
@@ -70,6 +110,12 @@ class CitationHelper extends AbstractHelper
           $chicago = '<em>' . $titleCased . '</em>. ' . $date . '. Fashion clipping. The FIT Designer Files. ' . $url;
           $mla = $titleCased . ' Fashion Clipping. ' . $date . '. The FIT Designer Files, ' . $url;
         }
+        break;
+
+      case 'Lookbooks':
+        $apa = '<em>' . $title . '</em>. (' . $date . ')' . '. [The FIT Designer Files]. ' . $url;
+        $chicago = '<em>' . $titleCased . '</em>. ' . $date . '. The FIT Designer Files. ' . $url;
+        $mla = '<em>' . $titleCased . '</em>. ' . $date . '. The FIT Designer Files, ' . $url;
         break;
 
       default:

@@ -143,11 +143,9 @@ foreach ($itemSets as $key => $itemSet) {
           <dt>
             <?php echo $translate('Citation'); ?>
           </dt>
-          <?php foreach ($designerSets as $designerSet): ?>
-            <dd class="value">
-              <?php echo $this->CitationHelper($item); ?>
-            </dd>
-          <?php endforeach; ?>
+          <dd class="value">
+            <?php echo $this->CitationHelper($item); ?>
+          </dd>
         </div>
       </dl>
     </div>
